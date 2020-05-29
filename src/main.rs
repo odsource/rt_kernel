@@ -44,7 +44,7 @@ fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
-// Tests
+// Test
 #[cfg(test)]
 fn test_runner(tests: &[&dyn Fn()]) {
     serial_println!("Running {} tests", tests.len());
@@ -52,13 +52,6 @@ fn test_runner(tests: &[&dyn Fn()]) {
         test();
     }
     exit_qemu(QemuExitCode::Success);
-}
-
-#[test_case]
-fn trivial_assertion() {
-    serial_print!("trivial assertion... ");
-    assert_eq!(1, 1);
-    serial_println!("[ok]");
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
