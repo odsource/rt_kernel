@@ -16,19 +16,22 @@ pub extern "C" fn _start() -> ! {
 
     rt_kernel::init();
 
+/*
     fn stack_overflow() {
         stack_overflow(); // for each recursion, the return address is pushed
     }
 
     // trigger a stack overflow
     stack_overflow();
-
-    // as before
+*/
     #[cfg(test)]
     test_main();
 
     println!("It did not crash!");
-    loop {}
+    loop {
+    	use rt_kernel::print;
+        print!("-");
+    }
 }
 
 /// This function is called on panic.
