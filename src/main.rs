@@ -28,10 +28,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("It did not crash!");
-    loop {
-    	use rt_kernel::print;
-        print!("-");
-    }
+    rt_kernel::hlt_loop();
 }
 
 /// This function is called on panic.
@@ -39,7 +36,7 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
 	println!("{}", _info);
-    loop {}
+    rt_kernel::hlt_loop();
 }
 
 // our panic handler in test mode
