@@ -16,7 +16,7 @@ pub extern "C" fn _start() -> ! {
 
     rt_kernel::init();
 
-/*
+/*	create stack overflow
     fn stack_overflow() {
         stack_overflow(); // for each recursion, the return address is pushed
     }
@@ -24,6 +24,25 @@ pub extern "C" fn _start() -> ! {
     // trigger a stack overflow
     stack_overflow();
 */
+
+/*	Page fault test
+	let ptr = 0x2031b2 as *mut u32;
+    // read from a code page
+	unsafe { let x = *ptr; }
+	println!("read worked");
+
+	// write to a code page
+	unsafe { *ptr = 42; }
+	println!("write worked");
+*/
+/*	Read page table address
+	use x86_64::registers::control::Cr3;
+
+    let (level_4_page_table, _) = Cr3::read();
+    println!("Level 4 page table at: {:?}", level_4_page_table.start_address());
+*/
+
+
     #[cfg(test)]
     test_main();
 
