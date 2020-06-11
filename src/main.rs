@@ -6,43 +6,39 @@
 
 use core::panic::PanicInfo;
 use rt_kernel::println;
-use bootloader::BootInfo;
+use bootloader::{BootInfo, entry_point};
 
-#[no_mangle] // don't mangle the name of this function
-pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
-    // this function is the entry point, since the linker looks for a function
-    // named `_start` by default
+entry_point!(kernel_main);
+
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    use rt_kernel::memory;
+    use x86_64::{structures::paging::MapperAllSizes, VirtAddr};
     
     println!("Hello World{}", "!");
 
     rt_kernel::init();
 
-/*	create stack overflow
-    fn stack_overflow() {
-        stack_overflow(); // for each recursion, the return address is pushed
+    let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
+
+    // initialize a mapper
+    let mapper = unsafe { memory::init(phys_mem_offset) };
+
+    let addresses = [
+        // the identity-mapped vga buffer page
+        0xb8000,
+        // some code page
+        0x201008,
+        // some stack page
+        0x0100_0020_1a10,
+        // virtual address mapped to physical address 0
+        boot_info.physical_memory_offset,
+    ];
+
+    for &address in &addresses {
+        let virt = VirtAddr::new(address);
+        let phys = mapper.translate_addr(virt);
+        println!("{:?} -> {:?}", virt, phys);
     }
-
-    // trigger a stack overflow
-    stack_overflow();
-*/
-
-/*	Page fault test
-	let ptr = 0x2031b2 as *mut u32;
-    // read from a code page
-	unsafe { let x = *ptr; }
-	println!("read worked");
-
-	// write to a code page
-	unsafe { *ptr = 42; }
-	println!("write worked");
-*/
-/*	Read page table address
-	use x86_64::registers::control::Cr3;
-
-    let (level_4_page_table, _) = Cr3::read();
-    println!("Level 4 page table at: {:?}", level_4_page_table.start_address());
-*/
-
 
     #[cfg(test)]
     test_main();
