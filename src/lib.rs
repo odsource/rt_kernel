@@ -17,6 +17,7 @@ pub mod interrupts;
 pub mod serial;
 pub mod vga_buffer;
 pub mod memory;
+pub mod allocator;
 
 #[cfg(test)]
 entry_point!(test_kernel_main);
