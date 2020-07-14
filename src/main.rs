@@ -59,6 +59,15 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     rt_kernel::hlt_loop();
 }
 
+async fn async_number() -> u32 {
+    42
+}
+
+async fn example_task() {
+    let number = async_number().await;
+    println!("async number: {}", number);
+}
+
 /// This function is called on panic.
 #[cfg(not(test))]
 #[panic_handler]
