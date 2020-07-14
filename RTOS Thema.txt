@@ -1,0 +1,18 @@
+RTOS Thema
+
+Paper was machen, was hab ich, wo will ich hin, wie mach ich des
+
+Nicht perfekt, Prototyp reicht 
+
+EDF Scheduling
+
+API und Programme dem Programmierer zur Verfügung stellen
+Deadline und Ausführungszeit sollte als Parameter da sein
+
+Determinismus bei multiplem Zugriff
+
+Sonntag Abgabe
+
+Scheduler erklären, Herausforderung des RT zu machen, scheduler deterministisch machen, was vom Projekt passt nicht
+
+Für Studenten schmackhaft machen (Des Highlight des Projekts, was gut lief was nicht)
