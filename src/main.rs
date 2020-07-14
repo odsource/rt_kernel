@@ -9,7 +9,7 @@ extern crate alloc;
 use core::panic::PanicInfo;
 use rt_kernel::println;
 use bootloader::{BootInfo, entry_point};
-use rt_kernel::task::{Task, simple_executor::SimpleExecutor};
+use rt_kernel::task::{Task, keyboard, executor::Executor};
 
 entry_point!(kernel_main);
 
@@ -31,17 +31,19 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     allocator::init_heap(&mut mapper, &mut frame_allocator)
         .expect("heap initialization failed");
 
-    let mut executor = SimpleExecutor::new();
-    executor.spawn(Task::new(example_task()));
-    executor.run();
-    
-    
-
     #[cfg(test)]
     test_main();
 
     println!("It did not crash!");
-    rt_kernel::hlt_loop();
+
+    let mut executor = Executor::new();
+    executor.spawn(Task::new(example_task()));
+    executor.spawn(Task::new(keyboard::print_keypresses()));
+    executor.run();
+    
+    // not needed because the Executor::run() function is marked as diverging
+    // and thus never returns
+    // rt_kernel::hlt_loop();
 }
 
 async fn async_number() -> u32 {
