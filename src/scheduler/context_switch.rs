@@ -1,11 +1,40 @@
 use x86_64::VirtAddr;
 
 // Assembler Part for register saving: switch processor state from old process to new one
-pub fn assembler_test() {
+/*
+asm!(assembly template
+   : output operands
+   : input operands
+   : clobbers
+   : options
+   );
+*/
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+pub fn switch_context(/*new_stack_ptr: VirtAddr*/) {
 	unsafe {
-    	asm!("nop");
+    	asm!("call switch"
+    		:
+    		: "rsi"/*(new_stack_ptr)*/
+    		: "rax", "rbx", "rcx", "rdx", "rbp", "rsp", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "rflags", "memory"
+    		: "intel", "volatile"
+    	);
 	}
 }
+
+global_asm!("
+	.intel_syntax noprefix
+
+	switch:
+		// Gets the register from the stack
+		pushfq
+
+		mov rax, rsp
+		mov rsp, rsi
+
+		// Pops the register on the stack
+		popfq
+		ret
+");
 
 // switch virtual memory mapping of the old process with the new one
 pub struct Stack {
@@ -19,7 +48,7 @@ impl Stack {
         }
     }
 
-    pub fn get(self) -> VirtAddr {
+    pub fn get_ptr(self) -> VirtAddr {
         self.ptr
     }
 }

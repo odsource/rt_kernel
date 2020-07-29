@@ -51,5 +51,5 @@ impl EDFScheduler {
 }
 
 pub fn context() {
-    context_switch::assembler_test();
+    context_switch::switch_context();
 }
