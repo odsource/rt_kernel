@@ -1,6 +1,7 @@
 use alloc::collections::VecDeque;
 
 use crate::println;
+use x86_64::VirtAddr;
 
 pub mod context_switch;
 
@@ -50,6 +51,6 @@ impl EDFScheduler {
     }
 }
 
-pub fn context() {
-    context_switch::switch_context();
+pub fn context(phys_mem_offset: VirtAddr) {
+    context_switch::switch_context(phys_mem_offset);
 }
