@@ -15,7 +15,7 @@ pub fn switch_context(new_stack_ptr: VirtAddr) {
     	asm!(
     		"call switch_stack_ptr"
     		:
-    		: "rsi"(new_stack_ptr)
+    		: "{rsi}"(new_stack_ptr)
     		: "rax", "rbx", "rcx", "rdx", "rbp", "rsp", "rsi", "rdi", "rflags", "memory", "r8", "r9", "r10", "r11", "r12", "r13", "r14"
     		: "intel", "volatile"
     	);
