@@ -2,6 +2,8 @@ use alloc::collections::VecDeque;
 
 use crate::println;
 
+pub mod context_switch;
+
 pub struct EDFTask {
     arrival: u32,
     exec: u32,
@@ -33,10 +35,11 @@ impl EDFScheduler {
         a * b / self.gcd(a, b)
     }
 
-    cpu_workload(&self) -> f32 {
-        let mut wl: f32;
-        for t in self.threads {
-            wl += t.exec / t.deadl;
+    fn cpu_workload(&self) -> f32 {
+        let mut wl: f32 = 0.0;
+
+        for i in 0..self.threads.len() {
+            wl += (self.threads[i].exec / self.threads[i].deadl) as f32;
         }
         wl
     }
@@ -45,4 +48,8 @@ impl EDFScheduler {
         println!("{}", 0);
         0
     }
+}
+
+pub fn context() {
+    context_switch::assembler_test();
 }

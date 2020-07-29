@@ -10,6 +10,7 @@ use core::panic::PanicInfo;
 use rt_kernel::println;
 use bootloader::{BootInfo, entry_point};
 use rt_kernel::task::{Task, keyboard, executor::Executor};
+use rt_kernel::scheduler;
 
 entry_point!(kernel_main);
 
@@ -35,6 +36,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     test_main();
 
     println!("It did not crash!");
+
+    scheduler::context();
 
     let mut executor = Executor::new();
     executor.spawn(Task::new(example_task()));
