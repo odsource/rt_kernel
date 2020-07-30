@@ -1,9 +1,10 @@
 use alloc::collections::VecDeque;
 use crate::println;
 use x86_64::VirtAddr;
-use crate::task::TaskId;
+use crate::scheduler::thread::ThreadId;
 
 pub mod context_switch;
+pub mod thread;
 
 //pub static EDF: EDFScheduler = EDFScheduler::new();
 
@@ -37,7 +38,7 @@ impl EDFScheduler {
         context(VirtAddr::new(10));
     }
 
-    pub fn new_thread(&self, thread: TaskId) {
+    pub fn new_thread(&self, thread: ThreadId) {
 
     }
 
