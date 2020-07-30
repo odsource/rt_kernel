@@ -8,7 +8,7 @@ use pic8259_simple::ChainedPics;
 use spin;
 use crate::print;
 use crate::hlt_loop;
-use crate::scheduler;
+use crate::scheduler::EDF;
 
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
@@ -63,7 +63,7 @@ extern "x86-interrupt" fn timer_interrupt_handler(
 {
     print!(".");
 
-    scheduler::EDF::schedule();
+    EDF::schedule();
 
     unsafe {
         PICS.lock()

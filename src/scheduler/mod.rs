@@ -6,7 +6,7 @@ use crate::scheduler::thread::ThreadId;
 pub mod context_switch;
 pub mod thread;
 
-//pub static EDF: EDFScheduler = EDFScheduler::new();
+pub static EDF: EDFScheduler = EDFScheduler::new();
 
 pub struct EDFTask {
     arrival: u32,

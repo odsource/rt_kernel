@@ -88,3 +88,19 @@ unsafe impl FrameAllocator<Size4KiB> for EmptyFrameAllocator {
         None
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct StackFrame {
+	start: VirtAddr,
+	end: VirtAddr,
+}
+
+impl StackFrame {
+	fn new(&mut self, start: VirtAddr, end: VirtAddr) {
+		self.start;
+		self.end;
+	}
+}
+
+
+//32 KiB für stack
