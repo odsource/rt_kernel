@@ -37,7 +37,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     println!("It did not crash!");
 
-    scheduler::context(VirtAddr::new(12 as u64));
+    let mut edf = EDFScheduler::new();
 
     let mut executor = Executor::new();
     executor.spawn(Task::new(example_task()));

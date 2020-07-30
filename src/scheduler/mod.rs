@@ -1,9 +1,11 @@
 use alloc::collections::VecDeque;
-
 use crate::println;
 use x86_64::VirtAddr;
+use crate::task::TaskId;
 
 pub mod context_switch;
+
+//pub static EDF: EDFScheduler = EDFScheduler::new();
 
 pub struct EDFTask {
     arrival: u32,
@@ -24,6 +26,21 @@ pub struct EDFScheduler {
 }
 
 impl EDFScheduler {
+    pub fn new() -> Self {
+        EDFScheduler {
+            threads: VecDeque::new(),
+            curr_thread: 0,
+        }
+    }
+
+    pub fn schedule(&self) {
+        context(VirtAddr::new(10));
+    }
+
+    pub fn new_thread(&self, thread: TaskId) {
+
+    }
+
     fn gcd(&self, m: u32, n: u32) -> u32 {
         if m == 0 {
             n
@@ -51,6 +68,6 @@ impl EDFScheduler {
     }
 }
 
-pub fn context(phys_mem_offset: VirtAddr) {
-    context_switch::switch_context(phys_mem_offset);
+pub fn context(ptr: VirtAddr) {
+    context_switch::switch_context(ptr);
 }

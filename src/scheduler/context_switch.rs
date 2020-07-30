@@ -26,13 +26,13 @@ global_asm!("
 	.intel_syntax noprefix
 
 	switch_stack_ptr:
-		// Gets the register from the stack
+		// Pushes the register to the stack (RFLAGS)
 		pushfq
 
 		mov rax, rsp
 		mov rsp, rsi
 
-		// Pops the register on the stack
+		// Pops the stack register to the register (RFLAGS)
 		popfq
 		ret
 ");
