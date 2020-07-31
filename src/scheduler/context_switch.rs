@@ -12,7 +12,7 @@ asm!(assembly template
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 pub fn switch_context(new_stack_ptr: VirtAddr) {
 	unsafe {
-    	asm!(
+    	llvm_asm!(
     		"call switch_stack_ptr"
     		:
     		: "{rsi}"(new_stack_ptr)

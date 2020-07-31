@@ -8,7 +8,7 @@
 #![feature(const_fn)]
 #![feature(const_in_array_repeat_expressions)]
 #![feature(wake_trait)]
-#![feature(asm)]
+#![feature(llvm_asm)]
 #![feature(global_asm)]
 
 extern crate alloc;
