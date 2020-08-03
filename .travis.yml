@@ -14,5 +14,6 @@ script:
   - cargo xbuild --verbose --all
 
 install:
+  - rustup component add llvm-tools-preview
   - cargo install bootimage --vers 0.8.0
   - cargo xbuild --verbose --all
