@@ -1,9 +1,6 @@
 language: rust
 rust:
   - nightly
-
-install:
-  - cargo xbuild --verbose --all
   
 cache:
   directories:
@@ -14,4 +11,8 @@ before_script:
   - export PATH=$PATH:$HOME/qemu/bin
 
 script:
+  - cargo xbuild --verbose --all
+
+install:
+  - cargo install bootimage
   - cargo xbuild --verbose --all
