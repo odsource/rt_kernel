@@ -2,11 +2,15 @@ use alloc::collections::VecDeque;
 use crate::println;
 use x86_64::VirtAddr;
 use crate::scheduler::thread::ThreadId;
+use lazy_static::lazy_static;
 
 pub mod context_switch;
 pub mod thread;
 
-pub static EDF: EDFScheduler = EDFScheduler::new();
+lazy_static! {
+    pub static ref EDF: EDFScheduler = EDFScheduler::new();
+}
+
 
 pub struct EDFTask {
     arrival: u32,
