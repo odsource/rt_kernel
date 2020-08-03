@@ -14,5 +14,5 @@ script:
   - cargo xbuild --verbose --all
 
 install:
-  - cargo install bootimage
+  - cargo install bootimage --vers 0.8.0
   - cargo xbuild --verbose --all
