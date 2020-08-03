@@ -15,5 +15,6 @@ script:
 
 install:
   - rustup component add llvm-tools-preview
+  - rustup component add rust-src
   - cargo install bootimage --vers 0.8.0 --target target.json
   - cargo xbuild --verbose --all
