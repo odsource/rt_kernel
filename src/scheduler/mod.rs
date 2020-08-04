@@ -26,10 +26,9 @@ impl EDFScheduler {
         }
     }
 
-    pub fn schedule(&self) {
+    pub fn schedule(&mut self) {
         if self.threads.len() > 1 {
-            let mut deadl = self.threads[0].deadl;
-            deadl -= TIMER;
+            self.threads[0].deadl -= TIMER;
             if self.threads[0].deadl < self.threads[1].deadl {
 
             } else {
