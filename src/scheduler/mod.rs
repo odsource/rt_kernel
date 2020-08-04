@@ -7,6 +7,8 @@ use lazy_static::lazy_static;
 pub mod context_switch;
 pub mod thread;
 
+static timer: u32 = 10;
+
 lazy_static! {
     pub static ref EDF: EDFScheduler = EDFScheduler::new();
 }
@@ -25,7 +27,18 @@ impl EDFScheduler {
     }
 
     pub fn schedule(&self) {
-        //context(VirtAddr::new(10));
+        if self.threads.len() > 1 {
+            let deadl = self.threads[0].deadl;
+            // -= timer;
+            if self.threads[0].deadl < self.threads[1].deadl {
+
+            } else {
+                //context(VirtAddr::new(self.threads.thread.stack_ptr));
+            }
+        } else {
+            
+        }
+        
     }
 
     pub fn new_thread(&mut self, thread: thread::Thread) {
@@ -37,7 +50,8 @@ impl EDFScheduler {
         // TODO: make a better calculation
         for i in 0..self.threads.len() {
             if self.threads[i].deadl < thread.deadl {
-                self.threads.insert(i, thread)
+                self.threads.insert(i, thread);
+                break;
             }
         }
     }
