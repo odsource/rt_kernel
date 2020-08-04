@@ -1,9 +1,10 @@
 use x86_64::{
-    structures::paging::{PageTable, OffsetPageTable, PhysFrame, Size4KiB, FrameAllocator},
+    structures::paging::{PageTable, PageTableFlags, Page, Mapper, mapper, OffsetPageTable, PhysFrame, Size4KiB, FrameAllocator},
     VirtAddr,
     PhysAddr,
 };
 use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
+use core::sync::atomic::{AtomicU64, Ordering};
 
 /// A FrameAllocator that returns usable frames from the bootloader's memory map.
 pub struct BootInfoFrameAllocator {
@@ -102,5 +103,40 @@ impl StackFrame {
 	}
 }
 
+// 32 KiB für stack
+fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<StackFrame, u64> {
+	// Atomic operation to ensure there is no context switch
+	static STACK: AtomicU64 = AtomicU64::new(0x888888880000);
+	let new_stack_start = STACK.fetch_add(8 * Page::<Size4KiB>::SIZE, Ordering::SeqCst);
+	let stack_start = Page::from_start_address(VirtAddr::new(new_stack_start)).expect("Stack start not accessible");
+	let stack_end = stack_start + 8;
 
-//32 KiB für stack
+	// Flags:
+	// present: frame is loaded into memory
+	let present = PageTableFlags::PRESENT;
+	// writable: makes the frame accessible
+	let writable = PageTableFlags::WRITABLE;
+
+	// allocate each page
+	for p in Page::range(stack_start, stack_end) {
+        let frame = frame_allocator.allocate_frame();
+
+        let frame = match frame {
+        	Some(v) => v,
+        	None => return Err(1),
+        };
+        unsafe {
+        	match mapper.map_to(p, frame, present | writable, frame_allocator) {
+	        	Ok(mf) => mf.flush(),
+	        	Err(_) => return Err(1),
+	        };
+        }
+        
+    }
+
+	let sf = StackFrame{
+		start: stack_start.start_address(),
+		end: stack_end.start_address(),
+	};
+	Ok(sf)
+}
