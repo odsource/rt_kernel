@@ -35,6 +35,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
+    let t1 = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator);
+
     println!("It did not crash!");
 
     let mut executor = Executor::new();

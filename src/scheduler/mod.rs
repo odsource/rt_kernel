@@ -27,14 +27,14 @@ pub struct EDFDeadline {
 
 pub struct EDFScheduler {
     threads: VecDeque<EDFTask>,
-    curr_thread: u32,
+    curr_thread: ThreadId,
 }
 
 impl EDFScheduler {
     pub fn new() -> Self {
         EDFScheduler {
             threads: VecDeque::new(),
-            curr_thread: 0,
+            curr_thread: ThreadId::new(),
         }
     }
 
