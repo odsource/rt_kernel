@@ -57,6 +57,6 @@ impl Stack {
     }
 
     pub fn method(&mut self, function: Box<dyn FnOnce() -> !>) {
-
+    	//mem::transmute(function);
     }
 }
