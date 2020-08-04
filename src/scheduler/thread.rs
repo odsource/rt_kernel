@@ -19,6 +19,7 @@ pub struct Thread {
     pub exec: u32,
     pub deadl: u32,
     pub period: u32,
+    pub time: u32,
     pub alive: bool
 }
 
@@ -40,6 +41,7 @@ impl Thread {
             exec: 0,
             deadl: 0,
             period: 0,
+            time: 0,
             alive: true,
         })
     }
@@ -49,6 +51,7 @@ impl Thread {
         self.exec = exec;
         self.deadl = deadl;
         self.period = period;
+        self.time = exec;
         self.alive = alive;
     }
 }

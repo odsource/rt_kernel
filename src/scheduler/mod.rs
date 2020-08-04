@@ -28,7 +28,7 @@ impl EDFScheduler {
 
     pub fn schedule(&mut self) {
         if self.threads.len() > 1 {
-            self.threads[0].deadl -= TIMER;
+            self.threads[0].time -= TIMER;
             if self.threads[0].deadl < self.threads[1].deadl {
 
             } else {
