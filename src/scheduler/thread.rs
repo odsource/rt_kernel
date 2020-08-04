@@ -1,20 +1,21 @@
 use core::sync::atomic::{AtomicU64, Ordering};
 use alloc::boxed::Box;
 use x86_64::VirtAddr;
+use crate::memory;
 
 #[derive(Debug)]
 pub struct Thread {
     id: ThreadId,
     stack_ptr: Option<VirtAddr>,
-    // TODO: eigene Stack Partition für jeden Thread
+    stack_frame: Option<memory::StackFrame>,
 }
 
 impl Thread {
-    pub fn new(stack_ptr: VirtAddr) -> Thread {
+    pub fn new(stack_ptr: VirtAddr, stack_frame: memory::StackFrame) -> Thread {
         Thread {
         	id: ThreadId::new(),
             stack_ptr: Some(stack_ptr),
-            // TODO: Stack
+            stack_frame: Some(stack_frame),
         }
     }
 }
