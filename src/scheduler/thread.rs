@@ -9,17 +9,17 @@ use crate::memory;
 use crate::println;
 use super::EDF;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Thread {
-    id: ThreadId,
-    stack_ptr: Option<VirtAddr>,
-    stack_frame: Option<memory::StackFrame>,
+    pub id: ThreadId,
+    pub stack_ptr: Option<VirtAddr>,
+    pub stack_frame: Option<memory::StackFrame>,
 
-    arrival: u32,
-    exec: u32,
-    deadl: u32,
-    period: u32,
-    alive: bool
+    pub arrival: u32,
+    pub exec: u32,
+    pub deadl: u32,
+    pub period: u32,
+    pub alive: bool
 }
 
 impl Thread {
@@ -35,7 +35,6 @@ impl Thread {
             exec: 0,
             deadl: 0,
             period: 0,
-            instance: 0,
             alive: true,
         })
     }

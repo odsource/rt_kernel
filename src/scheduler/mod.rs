@@ -11,22 +11,8 @@ lazy_static! {
     pub static ref EDF: EDFScheduler = EDFScheduler::new();
 }
 
-
-pub struct EDFTask {
-    arrival: u32,
-    exec: u32,
-    deadl: u32,
-    period: u32,
-    instance: u32,
-    alive: bool
-}
-
-pub struct EDFDeadline {
-
-}
-
 pub struct EDFScheduler {
-    threads: VecDeque<EDFTask>,
+    threads: VecDeque<thread::Thread>,
     curr_thread: ThreadId,
 }
 
@@ -42,8 +28,18 @@ impl EDFScheduler {
         //context(VirtAddr::new(10));
     }
 
-    pub fn new_thread(&self, thread: thread::Thread) {
+    pub fn new_thread(&mut self, thread: thread::Thread) {
+        self.calc_position(thread);
+    }
 
+    fn calc_position(&mut self, thread: thread::Thread) {
+        // Just an easy calculation for the start
+        // TODO: make a better calculation
+        for i in 0..self.threads.len() {
+            if self.threads[i].deadl < thread.deadl {
+                self.threads.insert(i, thread)
+            }
+        }
     }
 
     fn gcd(&self, m: u32, n: u32) -> u32 {
