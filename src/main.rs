@@ -40,6 +40,17 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     	Err(_) => None,
     };
 
+    let arrival = 0;
+    let exec = 20;
+    let deadl = 25;
+    let period = 50;
+    let alive = false;
+
+    match t1 {
+    	Some(mut t) => t.initialize(arrival, exec, deadl, period, alive),
+    	None => (),
+    }
+
     scheduler::EDF.lock().new_thread(t1);
 
     println!("It did not crash!");
