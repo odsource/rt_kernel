@@ -24,12 +24,13 @@ pub struct Thread {
 }
 
 impl Thread {
-    pub fn new(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<Self, u64> {
+    pub fn new(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>, function: Box<dyn FnOnce() -> !>) -> Result<Self, u64> {
         let stack_frame = memory::get_stack_frame(mapper, frame_allocator)?;
+        // stack has to grow downwards because the stack is always beginning at the end of the adress space
         let mut stack = unsafe {
             context_switch::Stack::new(stack_frame.end)
         };
-        stack.method(Box::new(thread_loop));
+        stack.method(function);
         let stack_ptr = stack.get_ptr();
 
         Ok(Thread {
@@ -66,9 +67,3 @@ impl ThreadId {
     }
 }
 
-fn thread_loop() -> ! {
-    let thread_id = EDF.lock().curr_thread;
-    loop {
-        println!("{:?}", thread_id);
-    }
-}

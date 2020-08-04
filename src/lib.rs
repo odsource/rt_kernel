@@ -11,6 +11,7 @@
 #![feature(llvm_asm)]
 #![feature(global_asm)]
 #![feature(never_type)]
+#![feature(raw)]
 
 extern crate alloc;
 

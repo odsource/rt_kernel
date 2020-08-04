@@ -11,6 +11,7 @@ use rt_kernel::println;
 use bootloader::{BootInfo, entry_point};
 use rt_kernel::task::{Task, keyboard, executor::Executor};
 use rt_kernel::scheduler;
+use alloc::boxed::Box;
 
 entry_point!(kernel_main);
 
@@ -35,7 +36,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
-    let t1 = match scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator) {
+    let t1 = match scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, Box::new(thread_loop)) {
     	Ok(t) => Some(t),
     	Err(_) => None,
     };
@@ -51,7 +52,24 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     	None => (),
     }
 
+    let t2 = match scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, Box::new(thread_loop)) {
+    	Ok(t) => Some(t),
+    	Err(_) => None,
+    };
+
+    let arrival2 = 0;
+    let exec2 = 30;
+    let deadl2 = 40;
+    let period2 = 80;
+    let alive2 = false;
+
+    match t2 {
+    	Some(mut t) => t.initialize(arrival2, exec2, deadl2, period2, alive2),
+    	None => (),
+    }
+
     scheduler::EDF.lock().new_thread(t1);
+    scheduler::EDF.lock().new_thread(t2);
 
     println!("It did not crash!");
 
@@ -72,6 +90,13 @@ async fn async_number() -> u32 {
 async fn example_task() {
     let number = async_number().await;
     println!("async number: {}", number);
+}
+
+fn thread_loop() -> ! {
+    let thread_id = scheduler::EDF.lock().curr_thread;
+    loop {
+        println!("{:?}", thread_id);
+    }
 }
 
 /// This function is called on panic.

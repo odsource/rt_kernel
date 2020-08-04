@@ -15,7 +15,7 @@ lazy_static! {
 
 pub struct EDFScheduler {
     threads: VecDeque<thread::Thread>,
-    curr_thread: ThreadId,
+    pub curr_thread: ThreadId,
 }
 
 impl EDFScheduler {

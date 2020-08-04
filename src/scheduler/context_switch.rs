@@ -1,5 +1,7 @@
 use x86_64::VirtAddr;
 use alloc::boxed::Box;
+use core::mem;
+use core::raw::TraitObject;
 
 // Assembler Part for register saving: switch processor state from old process to new one
 /*
