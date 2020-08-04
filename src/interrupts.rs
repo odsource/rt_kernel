@@ -63,7 +63,7 @@ extern "x86-interrupt" fn timer_interrupt_handler(
 {
     print!(".");
 
-    EDF.schedule();
+    EDF.lock().schedule();
 
     unsafe {
         PICS.lock()

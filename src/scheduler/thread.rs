@@ -1,9 +1,8 @@
 use core::sync::atomic::{AtomicU64, Ordering};
 use alloc::boxed::Box;
 use x86_64::{
-    structures::paging::{Mapper, mapper, Size4KiB, FrameAllocator},
+    structures::paging::{Mapper, Size4KiB, FrameAllocator},
     VirtAddr,
-    PhysAddr,
 };
 use crate::memory;
 use crate::println;
@@ -65,7 +64,7 @@ impl ThreadId {
 }
 
 fn thread_loop() -> ! {
-    let thread_id = EDF.curr_thread;
+    let thread_id = EDF.lock().curr_thread;
     loop {
         println!("{:?}", thread_id);
     }
