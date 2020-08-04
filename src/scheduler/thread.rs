@@ -7,7 +7,7 @@ use x86_64::{
 };
 use crate::memory;
 use crate::println;
-use crate::scheduler::EDF;
+use super::EDF;
 
 #[derive(Debug)]
 pub struct Thread {
@@ -19,7 +19,7 @@ pub struct Thread {
 impl Thread {
     pub fn new(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<Self, u64> {
         let stack_frame = memory::get_stack_frame(mapper, frame_allocator)?;
-        let stack_ptr = VirtAddr::new(0);
+        let stack_ptr = stack_frame.end;
         Ok(Thread {
         	id: ThreadId::new(),
             stack_ptr: Some(stack_ptr),
@@ -39,8 +39,8 @@ impl ThreadId {
 }
 
 fn thread_loop() -> ! {
-    //let thread_id = scheduler::EDF;
+    let thread_id = EDF.curr_thread;
     loop {
-        println!();
+        println!("{:?}", thread_id);
     }
 }

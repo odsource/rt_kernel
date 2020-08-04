@@ -92,8 +92,8 @@ unsafe impl FrameAllocator<Size4KiB> for EmptyFrameAllocator {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct StackFrame {
-	start: VirtAddr,
-	end: VirtAddr,
+	pub start: VirtAddr,
+	pub end: VirtAddr,
 }
 
 impl StackFrame {

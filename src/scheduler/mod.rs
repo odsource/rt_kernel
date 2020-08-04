@@ -39,7 +39,7 @@ impl EDFScheduler {
     }
 
     pub fn schedule(&self) {
-        context(VirtAddr::new(10));
+        //context(VirtAddr::new(10));
     }
 
     pub fn new_thread(&self, thread: ThreadId) {
