@@ -8,6 +8,7 @@ use x86_64::{
 use crate::memory;
 use crate::println;
 use super::EDF;
+use super::context_switch;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Thread {
@@ -25,7 +26,12 @@ pub struct Thread {
 impl Thread {
     pub fn new(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<Self, u64> {
         let stack_frame = memory::get_stack_frame(mapper, frame_allocator)?;
-        let stack_ptr = stack_frame.end;
+        let mut stack = unsafe {
+            context_switch::Stack::new(stack_frame.end)
+        };
+        stack.method(Box::new(thread_loop));
+        let stack_ptr = stack.get_ptr();
+
         Ok(Thread {
         	id: ThreadId::new(),
             stack_ptr: Some(stack_ptr),

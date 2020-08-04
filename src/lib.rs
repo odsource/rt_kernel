@@ -10,6 +10,7 @@
 #![feature(wake_trait)]
 #![feature(llvm_asm)]
 #![feature(global_asm)]
+#![feature(never_type)]
 
 extern crate alloc;
 

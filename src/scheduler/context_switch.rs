@@ -1,4 +1,5 @@
 use x86_64::VirtAddr;
+use alloc::boxed::Box;
 
 // Assembler Part for register saving: switch processor state from old process to new one
 /*
@@ -51,5 +52,9 @@ impl Stack {
 
     pub fn get_ptr(self) -> VirtAddr {
         self.ptr
+    }
+
+    pub fn method(&mut self, function: Box<dyn FnOnce() -> !>) {
+
     }
 }
