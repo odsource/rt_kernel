@@ -57,6 +57,9 @@ impl Stack {
     }
 
     pub fn method(&mut self, function: Box<dyn FnOnce() -> !>) {
-    	//mem::transmute(function);
+    	let stack_size = mem::size_of::<Box<dyn FnOnce() -> !>>();
+    	self.ptr -= stack_size;
+    	let ptr: *mut Box<dyn FnOnce() -> !> = self.ptr.as_mut_ptr();
+    	unsafe {ptr.write(function)};
     }
 }
