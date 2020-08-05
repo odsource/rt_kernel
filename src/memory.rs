@@ -5,6 +5,7 @@ use x86_64::{
 };
 use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
 use core::sync::atomic::{AtomicU64, Ordering};
+use crate::println;
 
 /// A FrameAllocator that returns usable frames from the bootloader's memory map.
 pub struct BootInfoFrameAllocator {
@@ -109,6 +110,9 @@ pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut
 	static STACK: AtomicU64 = AtomicU64::new(0x888888880000);
 	let new_stack_start = STACK.fetch_add(8 * Page::<Size4KiB>::SIZE, Ordering::SeqCst);
 	let stack_start = Page::from_start_address(VirtAddr::new(new_stack_start)).expect("Stack start not accessible");
+	println!();
+	println!("new_stack_start: {:?}, stack_start: {:?}", new_stack_start, stack_start);
+	println!();
 	let stack_end = stack_start + 8;
 
 	// Flags:

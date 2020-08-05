@@ -2,6 +2,7 @@ use x86_64::VirtAddr;
 use alloc::boxed::Box;
 use core::mem;
 use core::raw::TraitObject;
+use crate::println;
 
 // Assembler Part for register saving: switch processor state from old process to new one
 /*
@@ -56,10 +57,12 @@ impl Stack {
         self.ptr
     }
 
+
     pub fn method(&mut self, function: Box<dyn FnOnce() -> !>) {
     	let stack_size = mem::size_of::<Box<dyn FnOnce() -> !>>();
     	self.ptr -= stack_size;
     	let ptr: *mut Box<dyn FnOnce() -> !> = self.ptr.as_mut_ptr();
     	unsafe {ptr.write(function)};
     }
+
 }

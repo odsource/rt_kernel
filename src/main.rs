@@ -44,9 +44,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     let t1 = match scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, Box::new(thread_loop)) {
     	Ok(t) => {
-    		println!("Stack: ");
     		match t.stack_frame {
-    			Some(sf) => println!("{:?}, {:?}", sf.start, sf.end),
+    			Some(sf) => println!(), //println!("{:?}, {:?}", sf.start, sf.end),
     			None => println!("Nothing inside!"),
     		}
     		

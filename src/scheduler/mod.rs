@@ -35,7 +35,7 @@ impl EDFScheduler {
             }
             if self.threads[0].deadl < self.threads[1].deadl {
 
-            } else {
+            } else if self.threads[0].deadl > self.threads[1].deadl {
                 let thread = self.threads.pop_front();
                 self.new_thread(thread);
                 println!("Before context switch");
@@ -61,11 +61,10 @@ impl EDFScheduler {
                     self.threads.push_front(t);
                 } else {
                     for i in 0..self.threads.len() {
-                        if self.threads[i].deadl < t.deadl {
+                        if self.threads[i].deadl > t.deadl {
                             self.threads.insert(i, t);
                             break;
-                        } 
-                        if self.threads.len() == i + 1 {
+                        } else if self.threads.len() == i + 1 {
                             self.threads.push_back(t);
                         }
                     }

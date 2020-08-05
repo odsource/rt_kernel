@@ -15,6 +15,8 @@ pub struct Thread {
     pub stack_ptr: Option<VirtAddr>,
     pub stack_frame: Option<memory::StackFrame>,
 
+    //pub f: *mut fn() -> !,
+
     pub arrival: u32,
     pub exec: u32,
     pub deadl: u32,
@@ -30,13 +32,16 @@ impl Thread {
         let mut stack = unsafe {
             context_switch::Stack::new(stack_frame.end)
         };
-        stack.method(function);
+        //stack.method(function);
         let stack_ptr = stack.get_ptr();
+        //let func_ptr = Box::into_raw(function);//function.downcast::<fn() -> !>();
 
         Ok(Thread {
         	id: ThreadId::new(),
             stack_ptr: Some(stack_ptr),
             stack_frame: Some(stack_frame),
+
+            //f: func_ptr,
 
             arrival: 0,
             exec: 0,
