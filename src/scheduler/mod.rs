@@ -1,5 +1,5 @@
 use alloc::collections::VecDeque;
-use crate::println;
+use crate::{println, print};
 use x86_64::VirtAddr;
 use crate::scheduler::thread::ThreadId;
 use lazy_static::lazy_static;
@@ -27,15 +27,20 @@ impl EDFScheduler {
     }
 
     pub fn schedule(&mut self) {
+        print!("{}", self.threads.len());
         if self.threads.len() > 1 {
             // TODO: right implementation for choosing the next thread
-            self.threads[0].time -= TIMER;
+            if TIMER <= self.threads[0].time {
+                self.threads[0].time -= TIMER;
+            }
             if self.threads[0].deadl < self.threads[1].deadl {
 
             } else {
                 let thread = self.threads.pop_front();
                 self.new_thread(thread);
+                println!("Before context switch");
                 context(self.threads[0].stack_ptr.expect("No stack pointer inside thread!"));
+                println!("After context switch");
             }
         } else {
 
@@ -52,10 +57,17 @@ impl EDFScheduler {
         // TODO: make a better calculation
         match thread {
             Some(t) => {
-                for i in 0..self.threads.len() {
-                    if self.threads[i].deadl < t.deadl {
-                        self.threads.insert(i, t);
-                        break;
+                if self.threads.len() == 0 {
+                    self.threads.push_front(t);
+                } else {
+                    for i in 0..self.threads.len() {
+                        if self.threads[i].deadl < t.deadl {
+                            self.threads.insert(i, t);
+                            break;
+                        } 
+                        if self.threads.len() == i + 1 {
+                            self.threads.push_back(t);
+                        }
                     }
                 }
             },
