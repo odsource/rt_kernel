@@ -1,5 +1,5 @@
 use x86_64::{
-    structures::paging::{PageTable, PageTableFlags, Page, Mapper, OffsetPageTable, PhysFrame, Size4KiB, FrameAllocator},
+    structures::paging::{mapper::MapToError, PageTable, PageTableFlags, Page, Mapper, OffsetPageTable, PhysFrame, Size4KiB, FrameAllocator},
     VirtAddr,
     PhysAddr,
 };
@@ -105,7 +105,7 @@ impl StackFrame {
 }
 
 // 32 KiB für stack
-pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<StackFrame, u64> {
+pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<StackFrame, MapToError<Size4KiB>> {
 	// Atomic operation to ensure there is no context switch
 	static STACK: AtomicU64 = AtomicU64::new(0x888888880000);
 	let new_stack_start = STACK.fetch_add(8 * Page::<Size4KiB>::SIZE, Ordering::SeqCst);
@@ -125,17 +125,13 @@ pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut
 	for p in Page::range(stack_start, stack_end) {
         let frame = frame_allocator.allocate_frame();
 
-        let frame = match frame {
-        	Some(v) => v,
-        	None => return Err(1),
-        };
+        let frame = frame_allocator
+            .allocate_frame()
+            .ok_or(MapToError::FrameAllocationFailed)?;
+
         unsafe {
-        	match mapper.map_to(p, frame, present | writable, frame_allocator) {
-	        	Ok(mf) => mf.flush(),
-	        	Err(_) => return Err(1),
-	        };
-        }
-        
+        	mapper.map_to(p, frame, present | writable, frame_allocator)?.flush()
+        };
     }
 
 	let sf = StackFrame{

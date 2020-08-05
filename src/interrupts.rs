@@ -10,6 +10,8 @@ use crate::print;
 use crate::hlt_loop;
 use crate::scheduler::EDF;
 
+pub static mut GLOBAL_TIME: u64 = 0;
+
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
@@ -62,8 +64,9 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     _stack_frame: &mut InterruptStackFrame)
 {
     print!(".");
+    unsafe { GLOBAL_TIME += 1 };
 
-    EDF.lock().schedule();
+    //EDF.lock().schedule();
 
     unsafe {
         PICS.lock()

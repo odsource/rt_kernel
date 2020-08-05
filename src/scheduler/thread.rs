@@ -1,7 +1,7 @@
 use core::sync::atomic::{AtomicU64, Ordering};
 use alloc::boxed::Box;
 use x86_64::{
-    structures::paging::{Mapper, Size4KiB, FrameAllocator},
+    structures::paging::{mapper::MapToError, Mapper, Size4KiB, FrameAllocator},
     VirtAddr,
 };
 use crate::memory;
@@ -17,16 +17,14 @@ pub struct Thread {
 
     //pub f: *mut fn() -> !,
 
-    pub arrival: u32,
-    pub exec: u32,
-    pub deadl: u32,
-    pub period: u32,
-    pub time: u32,
-    pub alive: bool
+    pub runtime: u64,
+    pub deadline: u64,
+    pub period: u64,
+    pub remain_runtime: u64,
 }
 
 impl Thread {
-    pub fn new(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>, function: fn() -> !) -> Result<Self, u64> {
+    pub fn new(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>, function: fn() -> !) -> Result <Self, MapToError<Size4KiB>> {
         let stack_frame = memory::get_stack_frame(mapper, frame_allocator)?;
         // stack has to grow downwards because the stack is always beginning at the end of the adress space
         let mut stack = unsafe {
@@ -34,7 +32,6 @@ impl Thread {
         };
         stack.method(function);
         let stack_ptr = stack.get_ptr();
-        //let func_ptr = Box::into_raw(function);//function.downcast::<fn() -> !>();
 
         Ok(Thread {
         	id: ThreadId::new(),
@@ -43,22 +40,18 @@ impl Thread {
 
             //f: func_ptr,
 
-            arrival: 0,
-            exec: 0,
-            deadl: 0,
+            runtime: 0,
+            deadline: 0,
             period: 0,
-            time: 0,
-            alive: true,
+            remain_runtime: 0,
         })
     }
 
-    pub fn initialize(&mut self, arrival: u32, exec: u32, deadl: u32, period: u32, alive: bool) {
-        self.arrival = arrival;
-        self.exec = exec;
-        self.deadl = deadl;
+    pub fn initialize(&mut self, runtime: u64, deadline: u64, period: u64) {
+        self.runtime = runtime;
+        self.deadline = deadline;
         self.period = period;
-        self.time = exec;
-        self.alive = alive;
+        self.remain_runtime = runtime;
     }
 }
 

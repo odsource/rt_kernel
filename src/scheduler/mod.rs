@@ -1,8 +1,9 @@
-use alloc::collections::VecDeque;
+use alloc::collections::BTreeMap;
 use crate::{println, print};
 use x86_64::VirtAddr;
 use crate::scheduler::thread::ThreadId;
 use lazy_static::lazy_static;
+use crate::interrupts::GLOBAL_TIME;
 
 pub mod context_switch;
 pub mod thread;
@@ -14,95 +15,64 @@ lazy_static! {
 }
 
 pub struct EDFScheduler {
-    threads: VecDeque<thread::Thread>,
-    pub curr_thread: ThreadId,
+    tasks: BTreeMap<u64, thread::Thread>,
+    active_task: u64,
 }
 
 impl EDFScheduler {
     pub fn new() -> Self {
-        EDFScheduler {
-            threads: VecDeque::new(),
-            curr_thread: ThreadId::new(),
-        }
+        EDFScheduler { tasks: BTreeMap::new(), active_task: 0 }
+    }
+
+    pub fn start(&mut self) {
+        self.select_thread();
     }
 
     pub fn schedule(&mut self) {
-        if self.threads.len() > 1 {
-            println!("{:?}, {}", self.threads[0].id, self.threads.len());
-        }
-        if self.threads.len() > 1 {
-            // TODO: right implementation for choosing the next thread
-            if TIMER <= self.threads[0].time {
-                self.threads[0].time -= TIMER;
-            }
-            if self.threads[0].deadl < self.threads[1].deadl {
+        if let Some(at) = self.tasks.get_mut(&self.active_task) {
+            at.remain_runtime -= 1;
 
-            } else if self.threads[0].deadl > self.threads[1].deadl {
-                let thread = self.threads.pop_front();
-                self.new_thread(thread);
+            if at.remain_runtime == 0 {
+                if let Some(mut rpt) = self.tasks.remove(&self.active_task) {
+                    rpt.remain_runtime = rpt.runtime;
+                    unsafe{ self.tasks.insert(GLOBAL_TIME + rpt.deadline, rpt) };
+                }
+            }
+        }
+        
+        self.select_thread();      
+    }
+
+    fn select_thread(&mut self) {
+        if let Some((key, val)) = self.tasks.first_key_value() {
+            if *key != self.active_task {
                 println!("Before context switch");
-                context(self.threads[0].stack_ptr.expect("No stack pointer inside thread!"));
-                self.curr_thread = self.threads[0].id;
+                context(val.stack_ptr.expect("No stack pointer inside thread!"));
+                self.active_task = *key;
                 println!("After context switch");
             }
+        }  
+    }
+
+    pub fn new_thread(&mut self, t: thread::Thread) {
+        let mut u = 0.0;
+        for (_key, value) in self.tasks.iter() {
+            u += value.runtime as f64 / value.period as f64;
+        }
+        u += t.runtime as f64 / t.period as f64;
+
+        // single proccessor schedulability test
+        if u > 1.0 {
+            println!("Can't schedule task -> Processor utilization exceeded 100%.");
         } else {
-
-        }
-        
-    }
-
-    pub fn new_thread(&mut self, thread: Option<thread::Thread>) {
-        self.calc_position(thread);
-    }
-
-    fn calc_position(&mut self, thread: Option<thread::Thread>) {
-        // Just an easy calculation for the start
-        // TODO: make a better calculation
-        match thread {
-            Some(t) => {
-                if self.threads.len() == 0 {
-                    self.threads.push_front(t);
-                } else {
-                    for i in 0..self.threads.len() {
-                        if self.threads[i].deadl > t.deadl {
-                            self.threads.insert(i, t);
-                            break;
-                        } else if self.threads.len() == i + 1 {
-                            self.threads.push_back(t);
-                        }
-                    }
-                }
-            },
-            None => println!("Could not insert thread"),
-        }
-        self.curr_thread = self.threads[0].id;
-        
-    }
-
-    fn gcd(&self, m: u32, n: u32) -> u32 {
-        if m == 0 {
-            n
-        } else {
-            self.gcd(n % m, m)
+            unsafe{ self.tasks.insert(GLOBAL_TIME +  t.deadline, t) };
         }
     }
 
-    fn lcm(&self, a: u32, b: u32) -> u32 {
-        a * b / self.gcd(a, b)
-    }
-
-    fn cpu_workload(&self) -> f32 {
-        let mut wl: f32 = 0.0;
-
-        for i in 0..self.threads.len() {
-            wl += (self.threads[i].exec / self.threads[i].deadl) as f32;
+    pub fn print_tree(&self) {
+        for (key, value) in self.tasks.iter() {
+            println!("Thread {}", key);
         }
-        wl
-    }
-
-    fn calc_hyperperiod(&self) -> u32 {
-        println!("{}", 0);
-        0
     }
 }
 

@@ -12,6 +12,7 @@
 #![feature(global_asm)]
 #![feature(never_type)]
 #![feature(raw)]
+#![feature(map_first_last)]
 
 extern crate alloc;
 

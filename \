@@ -38,7 +38,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     test_main();
 
     let exec = 20;
-    let deadl = 50;
+    let deadl = 20;
     let period = 50;
 
     if let Ok(mut t1) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread1_loop) {
@@ -47,16 +47,13 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     }
     
     let exec2 = 30;
-    let deadl2 = 60;
-    let period2 = 60;
+    let deadl2 = 50;
+    let period2 = 50;
 
     if let Ok(mut t2) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread2_loop) {
         t2.initialize(exec2, deadl2, period2);
         scheduler::EDF.lock().new_thread(t2);
     }
-
-    scheduler::EDF.lock().print_tree();
-    scheduler::EDF.lock().start();
 
     println!("It did not crash!");
 
