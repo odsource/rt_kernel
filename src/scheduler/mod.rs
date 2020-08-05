@@ -28,11 +28,14 @@ impl EDFScheduler {
 
     pub fn schedule(&mut self) {
         if self.threads.len() > 1 {
+            // TODO: right implementation for choosing the next thread
             self.threads[0].time -= TIMER;
             if self.threads[0].deadl < self.threads[1].deadl {
 
             } else {
-                //context(VirtAddr::new(self.threads.thread.stack_ptr));
+                let thread = self.threads.pop_front();
+                self.new_thread(thread);
+                context(self.threads[0].stack_ptr.expect("No stack pointer inside thread!"));
             }
         } else {
 
@@ -88,8 +91,8 @@ impl EDFScheduler {
     }
 }
 
-pub fn context(ptr: VirtAddr) {
-    context_switch::switch_context(ptr);
+pub fn context(stack_ptr: VirtAddr) {
+    context_switch::switch_context(stack_ptr);
 }
 
 /// A wrapper around spin::Mutex to permit trait implementations.
