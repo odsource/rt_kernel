@@ -27,7 +27,9 @@ impl EDFScheduler {
     }
 
     pub fn schedule(&mut self) {
-        // print!("{}", self.threads.len());
+        if self.threads.len() > 1 {
+            println!("{:?}, {}", self.threads[0].id, self.threads.len());
+        }
         if self.threads.len() > 1 {
             // TODO: right implementation for choosing the next thread
             if TIMER <= self.threads[0].time {
@@ -40,6 +42,7 @@ impl EDFScheduler {
                 self.new_thread(thread);
                 println!("Before context switch");
                 context(self.threads[0].stack_ptr.expect("No stack pointer inside thread!"));
+                self.curr_thread = self.threads[0].id;
                 println!("After context switch");
             }
         } else {
@@ -72,6 +75,7 @@ impl EDFScheduler {
             },
             None => println!("Could not insert thread"),
         }
+        self.curr_thread = self.threads[0].id;
         
     }
 

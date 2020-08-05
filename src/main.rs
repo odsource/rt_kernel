@@ -61,7 +61,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     let arrival2 = 0;
     let exec2 = 30;
-    let deadl2 = 40;
+    let deadl2 = 20;
     let period2 = 80;
     let alive2 = false;
 
@@ -80,11 +80,13 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     println!("It did not crash!");
 
+    start_loop();
+/*
     let mut executor = Executor::new();
     executor.spawn(Task::new(example_task()));
     executor.spawn(Task::new(keyboard::print_keypresses()));
     executor.run();
-    
+*/
     // not needed because the Executor::run() function is marked as diverging
     // and thus never returns
     // rt_kernel::hlt_loop();
@@ -97,6 +99,12 @@ async fn async_number() -> u32 {
 async fn example_task() {
     let number = async_number().await;
     println!("async number: {}", number);
+}
+
+fn start_loop() -> ! {
+	loop {
+
+	}
 }
 
 fn thread_loop() -> ! {
