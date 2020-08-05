@@ -15,32 +15,37 @@ lazy_static! {
 }
 
 pub struct EDFScheduler {
+    init: bool,
     tasks: BTreeMap<u64, thread::Thread>,
     active_task: u64,
 }
 
 impl EDFScheduler {
     pub fn new() -> Self {
-        EDFScheduler { tasks: BTreeMap::new(), active_task: 0 }
+        EDFScheduler { init: false, tasks: BTreeMap::new(), active_task: 0 }
     }
 
     pub fn start(&mut self) {
         self.select_thread();
+        self.init = true;
     }
 
     pub fn schedule(&mut self) {
-        if let Some(at) = self.tasks.get_mut(&self.active_task) {
-            at.remain_runtime -= 1;
+        if self.init {
+            self.print_tree();
+            if let Some(at) = self.tasks.get_mut(&self.active_task) {
+                at.remain_runtime -= 1;
 
-            if at.remain_runtime == 0 {
-                if let Some(mut rpt) = self.tasks.remove(&self.active_task) {
-                    rpt.remain_runtime = rpt.runtime;
-                    unsafe{ self.tasks.insert(GLOBAL_TIME + rpt.deadline, rpt) };
+                if at.remain_runtime == 0 {
+                    if let Some(mut rpt) = self.tasks.remove(&self.active_task) {
+                        rpt.remain_runtime = rpt.runtime;
+                        unsafe{ self.tasks.insert(GLOBAL_TIME + rpt.deadline, rpt) };
+                    }
                 }
             }
-        }
         
-        self.select_thread();      
+            self.select_thread();
+        }
     }
 
     fn select_thread(&mut self) {
@@ -71,7 +76,7 @@ impl EDFScheduler {
 
     pub fn print_tree(&self) {
         for (key, value) in self.tasks.iter() {
-            println!("Thread {}", key);
+            println!("Thread: dead: {}, remain: {}", key, value.remain_runtime);
         }
     }
 }

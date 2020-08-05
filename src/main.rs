@@ -81,16 +81,16 @@ async fn example_task() {
 }
 
 fn thread1_loop() -> ! {
-    let a: [u64; 5] = [1, 2, 3, 4, 5];
+    let a: [u64; 2] = [1, 2];
     loop {
-        println!("Thread 1 executing {}", a[0]);
+        println!("Thread {} executing", a[0]);
     }
 }
 
 fn thread2_loop() -> ! {
-    let a: [u64; 5] = [1, 2, 3, 4, 5];
+    let a: [u64; 2] = [1, 2];
     loop {
-        println!("Thread 2 executing {}", a[1]);
+        println!("Thread {} executing", a[1]);
     }
 }
 
