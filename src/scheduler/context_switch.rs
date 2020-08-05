@@ -57,13 +57,12 @@ impl Stack {
         self.ptr
     }
 
-
-    pub fn method(&mut self, function: Box<dyn FnOnce() -> !>) -> *mut Box<dyn FnOnce() -> !> {
-    	let stack_size = mem::size_of::<Box<dyn FnOnce() -> !>>();
+    // Write the loop-function to the stack
+    pub fn method<T>(&mut self, function: T) {
+    	let stack_size = mem::size_of::<T>();
     	self.ptr -= stack_size;
-    	let ptr: *mut Box<dyn FnOnce() -> !> = self.ptr.as_mut_ptr();
+    	let ptr: *mut T = self.ptr.as_mut_ptr();
     	unsafe {ptr.write(function)};
-    	return ptr;
     }
 
 }

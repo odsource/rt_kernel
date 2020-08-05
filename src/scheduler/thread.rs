@@ -26,13 +26,13 @@ pub struct Thread {
 }
 
 impl Thread {
-    pub fn new(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>, function: Box<dyn FnOnce() -> !>) -> Result<Self, u64> {
+    pub fn new(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>, function: fn() -> !) -> Result<Self, u64> {
         let stack_frame = memory::get_stack_frame(mapper, frame_allocator)?;
         // stack has to grow downwards because the stack is always beginning at the end of the adress space
         let mut stack = unsafe {
             context_switch::Stack::new(stack_frame.end)
         };
-        let func_ptr = stack.method(function);
+        stack.method(function);
         let stack_ptr = stack.get_ptr();
         //let func_ptr = Box::into_raw(function);//function.downcast::<fn() -> !>();
 

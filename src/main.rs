@@ -42,7 +42,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     let period = 50;
     let alive = false;
 
-    let t1 = match scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, Box::new(thread_loop)) {
+    let t1 = match scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread_loop) {
     	Ok(t) => {
     		match t.stack_frame {
     			Some(sf) => println!(), //println!("{:?}, {:?}", sf.start, sf.end),
@@ -65,7 +65,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     let period2 = 80;
     let alive2 = false;
 
-    let t2 = match scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, Box::new(thread_loop)) {
+    let t2 = match scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread_loop) {
     	Ok(t) => Some(t),
     	Err(_) => None,
     };

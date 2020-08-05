@@ -27,7 +27,7 @@ impl EDFScheduler {
     }
 
     pub fn schedule(&mut self) {
-        print!("{}", self.threads.len());
+        // print!("{}", self.threads.len());
         if self.threads.len() > 1 {
             // TODO: right implementation for choosing the next thread
             if TIMER <= self.threads[0].time {
