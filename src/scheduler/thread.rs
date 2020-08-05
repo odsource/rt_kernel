@@ -32,7 +32,7 @@ impl Thread {
         let mut stack = unsafe {
             context_switch::Stack::new(stack_frame.end)
         };
-        //stack.method(function);
+        let func_ptr = stack.method(function);
         let stack_ptr = stack.get_ptr();
         //let func_ptr = Box::into_raw(function);//function.downcast::<fn() -> !>();
 
@@ -71,4 +71,3 @@ impl ThreadId {
         ThreadId(NEXT_ID.fetch_add(1, Ordering::Relaxed))
     }
 }
-
