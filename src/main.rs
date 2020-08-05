@@ -38,8 +38,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     test_main();
 
     let exec = 20;
-    let deadl = 50;
-    let period = 50;
+    let deadl = 60;
+    let period = 60;
 
     if let Ok(mut t1) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread1_loop) {
         t1.initialize(exec, deadl, period);
@@ -47,8 +47,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     }
     
     let exec2 = 30;
-    let deadl2 = 60;
-    let period2 = 60;
+    let deadl2 = 50;
+    let period2 = 50;
 
     if let Ok(mut t2) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread2_loop) {
         t2.initialize(exec2, deadl2, period2);
@@ -81,14 +81,16 @@ async fn example_task() {
 }
 
 fn thread1_loop() -> ! {
+    let a: [u64; 5] = [1, 2, 3, 4, 5];
     loop {
-        println!("Thread 1 executing");
+        println!("Thread 1 executing {}", a[0]);
     }
 }
 
 fn thread2_loop() -> ! {
+    let a: [u64; 5] = [1, 2, 3, 4, 5];
     loop {
-        println!("Thread 2 executing");
+        println!("Thread 2 executing {}", a[1]);
     }
 }
 
