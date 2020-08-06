@@ -76,8 +76,12 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     }
     
     //EDF.force_unlock();
+    println!("Locking IR OLD");
     EDF.lock().set_old_ptr(OLD_POINTER.lock().get_ptr());
+    println!("Unlocked IR OLD");
+    println!("Locking IR");
     let pair = EDF.lock().schedule();
+    println!("Unlocked IR");
     match pair {
     	Some((k,v)) => {
     		scheduler::context(v.stack_ptr.expect("No stack pointer inside thread!"));
