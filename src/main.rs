@@ -101,9 +101,13 @@ fn thread2_loop() -> ! {
     let a: [u64; 2] = [1, 2];
     let mut i = 0;
     println!("Thread 2");
+
     loop {
     	if i == 100000000 {
     		i = 0;
+    		x86_64::instructions::interrupts::disable();
+		    scheduler::EDF.lock().print_tree();
+		    x86_64::instructions::interrupts::enable();
     		println!("Thread {} executing", a[1]);
     	}
         i += 1;
