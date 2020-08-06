@@ -107,7 +107,7 @@ impl StackFrame {
 // 32 KiB für stack
 pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut impl FrameAllocator<Size4KiB>) -> Result<StackFrame, MapToError<Size4KiB>> {
 	// Atomic operation to ensure there is no context switch
-	static STACK: AtomicU64 = AtomicU64::new(0x888888880000);
+	static STACK: AtomicU64 = AtomicU64::new(0x_8888_8888_0000);
 	let new_stack_start = STACK.fetch_add(8 * Page::<Size4KiB>::SIZE, Ordering::SeqCst);
 	let stack_start = Page::from_start_address(VirtAddr::new(new_stack_start)).expect("Stack start not accessible");
 	println!();

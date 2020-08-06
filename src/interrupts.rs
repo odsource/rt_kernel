@@ -26,7 +26,7 @@ pub enum InterruptIndex {
 }
 
 impl InterruptIndex {
-    fn as_u8(self) -> u8 {
+    pub fn as_u8(self) -> u8 {
         self as u8
     }
 
@@ -66,12 +66,13 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     print!(".");
     unsafe { GLOBAL_TIME += 1 };
 
-    EDF.lock().schedule();
-
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }
+    println!("Before schedule");
+    EDF.lock().schedule();
+    //println!("End of interrupt");
 }
 
 extern "x86-interrupt" fn breakpoint_handler(

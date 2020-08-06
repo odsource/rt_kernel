@@ -3,7 +3,7 @@ use crate::{println, print};
 use x86_64::VirtAddr;
 use crate::scheduler::thread::ThreadId;
 use lazy_static::lazy_static;
-use crate::interrupts::GLOBAL_TIME;
+use crate::interrupts::{GLOBAL_TIME, PICS, InterruptIndex};
 
 pub mod context_switch;
 pub mod thread;
@@ -26,12 +26,13 @@ impl EDFScheduler {
     }
 
     pub fn start(&mut self) {
+        println!("Scheduler started");
         self.select_thread();
-        self.init = true;
     }
 
     pub fn schedule(&mut self) {
-        if self.init {
+        if self.init == true {
+            println!("Inside init");
             self.print_tree();
             if let Some(at) = self.tasks.get_mut(&self.active_task) {
                 at.remain_runtime -= 1;
@@ -52,9 +53,9 @@ impl EDFScheduler {
         if let Some((key, val)) = self.tasks.first_key_value() {
             if *key != self.active_task {
                 println!("Before context switch");
-                context(val.stack_ptr.expect("No stack pointer inside thread!"));
                 self.active_task = *key;
-                println!("After context switch");
+                self.init = true;
+                context(val.stack_ptr.expect("No stack pointer inside thread!")); 
             }
         }  
     }

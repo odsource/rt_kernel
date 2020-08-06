@@ -60,7 +60,7 @@ impl Stack {
     // Write the loop-function to the stack
     pub fn method<T>(&mut self, function: T) {
     	let stack_size = mem::size_of::<T>();
-        println!("Function size: {:?}", stack_size);
+        //println!("Function size: {:?}", stack_size);
     	self.ptr -= stack_size;
     	let ptr: *mut T = self.ptr.as_mut_ptr();
     	unsafe {ptr.write(function)};

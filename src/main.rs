@@ -21,8 +21,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     use rt_kernel::memory::{self, BootInfoFrameAllocator};
     use x86_64::VirtAddr;
     
-    println!("Hello World{}", "!");
-
     rt_kernel::init();
 
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
@@ -82,6 +80,7 @@ async fn example_task() {
 
 fn thread1_loop() -> ! {
     let a: [u64; 2] = [1, 2];
+    //println!("Thread 1");
     loop {
         println!("Thread {} executing", a[0]);
     }
@@ -89,6 +88,7 @@ fn thread1_loop() -> ! {
 
 fn thread2_loop() -> ! {
     let a: [u64; 2] = [1, 2];
+    //println!("Thread 2");
     loop {
         println!("Thread {} executing", a[1]);
     }
