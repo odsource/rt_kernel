@@ -34,9 +34,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
+    x86_64::instructions::interrupts::disable();
     let exec = 25;
-    let deadl = 120;
-    let period = 120;
+    let deadl = 123;
+    let period = 123;
 
     if let Ok(mut t1) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread1_loop) {
         t1.initialize(exec, deadl, period);
@@ -44,8 +45,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     }
     
     let exec2 = 30;
-    let deadl2 = 60;
-    let period2 = 60;
+    let deadl2 = 61;
+    let period2 = 61;
 
     if let Ok(mut t2) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread2_loop) {
         t2.initialize(exec2, deadl2, period2);
@@ -63,6 +64,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
 
     let pair = scheduler::EDF.lock().start();
+    x86_64::instructions::interrupts::enable();
 
     match pair {
     	Some((k,v)) => {
