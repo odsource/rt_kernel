@@ -66,11 +66,14 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     print!(".");
     unsafe { GLOBAL_TIME += 1 };
 
+    println!("Before schedule");
+
+    // Has to be in front of EDF.schedule() because after the context switch it will never be executed
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }
-    println!("Before schedule");
+    
     EDF.lock().schedule();
     //println!("End of interrupt");
 }
