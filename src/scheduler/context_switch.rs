@@ -16,6 +16,7 @@ asm!(assembly template
 */
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 pub fn switch_context(new_stack_ptr: VirtAddr) {
+	println!("context stack_ptr: {:?}", new_stack_ptr);
 	unsafe {
     	llvm_asm!(
     		"call switch_stack_ptr"
@@ -29,12 +30,13 @@ pub fn switch_context(new_stack_ptr: VirtAddr) {
 
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 pub fn first_switch_context(new_stack_ptr: VirtAddr) {
+	println!("context stack_ptr: {:?}", new_stack_ptr);
 	unsafe {
     	llvm_asm!(
     		"call first_switch_stack_ptr"
     		:
     		: "{rsi}"(new_stack_ptr)
-    		: "rax", "rbx", "rcx", "rdx", "rbp", "rsp", "rsi", "rdi", "rflags", "memory", "r8", "r9", "r10", "r11", "r12", "r13", "r14"
+    		: "rax", "rbx", "rcx", "rdx", "rbp", "rsi", "rdi", "rflags", "memory", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"
     		: "intel", "volatile"
     	);
 	}
@@ -97,7 +99,7 @@ impl Stack {
     // Write the loop-function to the stack
     pub fn method<T>(&mut self, function: T) {
     	let stack_size = mem::size_of::<T>();
-        //println!("Function size: {:?}", stack_size);
+        println!("Ptr is on: {:?}", self.ptr);
     	self.ptr -= stack_size;
     	let ptr: *mut T = self.ptr.as_mut_ptr();
     	println!("Ptr is on: {:?}", self.ptr);

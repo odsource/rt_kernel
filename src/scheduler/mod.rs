@@ -128,7 +128,7 @@ impl<A> Locked<A> {
         self.inner.try_lock()
     }
 
-    fn force_unlock(&self) {
+    pub fn force_unlock(&self) {
         unsafe {self.inner.force_unlock();}
     }
 }

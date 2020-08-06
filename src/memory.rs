@@ -123,8 +123,7 @@ pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut
 	// writable: makes the frame accessible
 	let writable = PageTableFlags::WRITABLE;
 
-	let user = PageTableFlags::USER_ACCESSIBLE;
-	let flags = present | writable | user;
+	let flags = present | writable;
 
 	// allocate each page
 	for p in Page::range(stack_start, stack_end) {

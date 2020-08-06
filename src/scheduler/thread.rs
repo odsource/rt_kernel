@@ -15,8 +15,6 @@ pub struct Thread {
     pub stack_ptr: Option<VirtAddr>,
     pub stack_frame: Option<memory::StackFrame>,
 
-    //pub f: *mut fn() -> !,
-
     pub runtime: u64,
     pub deadline: u64,
     pub period: u64,
@@ -32,14 +30,11 @@ impl Thread {
         };
         stack.method(function);
         let stack_ptr = stack.get_ptr();
-        println!("Ptr is on: {:?}", stack_ptr);
 
         Ok(Thread {
         	id: ThreadId::new(),
             stack_ptr: Some(stack_ptr),
             stack_frame: Some(stack_frame),
-
-            //f: func_ptr,
 
             runtime: 0,
             deadline: 0,
