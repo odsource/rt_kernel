@@ -74,7 +74,7 @@ extern "x86-interrupt" fn timer_interrupt_handler(
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }
     
-    EDF.force_unlock();
+    //EDF.force_unlock();
     let lock = EDF.try_lock();
     match lock {
     	Some(mut s) => {

@@ -57,6 +57,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     }
 
     //scheduler::EDF.lock().print_tree();
+    x86_64::instructions::interrupts::disable();
     scheduler::EDF.lock().start();
 
     println!("It did not crash!");
@@ -78,7 +79,7 @@ fn thread1_loop() -> ! {
     let mut i = 0;
     println!("Thread 1");
     loop {
-    	if i == 100000000 {
+    	if i == 10000000 {
     		i = 0;
     		println!("Thread {} executing", a[0]);
     	}
@@ -94,11 +95,13 @@ fn thread2_loop() -> ! {
     println!("Thread 2");
 
     loop {
-    	if i == 100000000 {
+    	if i == 10000000 {
     		i = 0;
+    		/*
     		x86_64::instructions::interrupts::disable();
 		    scheduler::EDF.lock().print_tree();
 		    x86_64::instructions::interrupts::enable();
+		    */
     		println!("Thread {} executing", a[1]);
     	}
         i += 1;

@@ -80,7 +80,19 @@ impl EDFScheduler {
         //print!("After schedule");
     }
 
-    fn select_thread(&mut self) {
+    fn select_thread(&mut self) -> Option<(u64, thread::Thread)>{
+        let pair = self.tasks.first_key_value();
+        let key;
+        let val;
+        match pair {
+            Some((k,v)) => {
+                key = k;
+                val = v;
+            },
+            None => (),
+        };
+        Some((*key, *val))
+        /*
         if let Some((key, val)) = self.tasks.first_key_value() {
             if *key != self.active_task {
                 println!("Before context switch");
@@ -93,7 +105,8 @@ impl EDFScheduler {
                     context(val.stack_ptr.expect("No stack pointer inside thread!")); 
                 }
             }
-        }  
+        } 
+        */ 
     }
 
 /*

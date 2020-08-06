@@ -99,8 +99,8 @@ pub struct StackFrame {
 
 impl StackFrame {
 	fn new(&mut self, start: VirtAddr, end: VirtAddr) {
-		self.start;
-		self.end;
+		self.start = start;
+		self.end = end;
 	}
 }
 
@@ -127,8 +127,6 @@ pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut
 
 	// allocate each page
 	for p in Page::range(stack_start, stack_end) {
-        let frame = frame_allocator.allocate_frame();
-
         let frame = frame_allocator
             .allocate_frame()
             .ok_or(MapToError::FrameAllocationFailed)?;
