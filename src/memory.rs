@@ -111,9 +111,6 @@ pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut
 	let new_stack_start = STACK.fetch_add(8 * Page::<Size4KiB>::SIZE, Ordering::SeqCst);
 
 	let stack_start = Page::from_start_address(VirtAddr::new(new_stack_start)).expect("Stack start not accessible") + 1;
-	println!();
-	println!("stack_start: {:?}", stack_start);
-	println!();
 	let stack_end = stack_start + 8;
 
 	println!();
