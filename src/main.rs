@@ -34,7 +34,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
-    x86_64::instructions::interrupts::disable();
+    //x86_64::instructions::interrupts::disable();
     let exec = 25;
     let deadl = 123;
     let period = 123;
@@ -72,7 +72,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println!("Locking START");
     let pair = scheduler::EDF.lock().start();
     println!("Unlocking START");
-    x86_64::instructions::interrupts::enable();
+    //x86_64::instructions::interrupts::enable();
 
     match pair {
     	Some((k,v)) => {
