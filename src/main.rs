@@ -12,7 +12,6 @@ use rt_kernel::println;
 use bootloader::{BootInfo, entry_point};
 use rt_kernel::task::{Task, keyboard, executor::Executor};
 use rt_kernel::scheduler;
-use alloc::boxed::Box;
 
 entry_point!(kernel_main);
 
@@ -73,14 +72,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     rt_kernel::hlt_loop();
 }
 
-async fn async_number() -> u32 {
-    42
-}
-
-async fn example_task() {
-    let number = async_number().await;
-    println!("async number: {}", number);
-}
 
 fn thread1_loop() -> ! {
     let a: [u64; 2] = [1, 2];

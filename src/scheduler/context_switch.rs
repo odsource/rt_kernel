@@ -54,13 +54,15 @@ global_asm!("
 
 		mov rdi, rax
 
-		call old_stack_ptr
+		//call old_stack_ptr
 
 		// Pops the stack register to the register (RFLAGS)
 		popfq
 		ret
 ");
 
+// Obsolete because of the interrupt enable through 0x200
+/*
 global_asm!("
 	.intel_syntax noprefix
 
@@ -70,9 +72,12 @@ global_asm!("
 
 		mov rax, rsp
 		mov rsp, rsi
+
+		popfq
 		
 		ret
 ");
+*/
 
 #[no_mangle]
 pub extern "C" fn old_stack_ptr(old_ptr: VirtAddr) {

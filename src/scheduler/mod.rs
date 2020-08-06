@@ -32,7 +32,6 @@ impl EDFScheduler {
     }
 
     pub fn schedule(&mut self) {
-        //println!("Before init");
         if self.init == true {
             //println!("Inside init");
             //self.print_tree();
@@ -49,6 +48,7 @@ impl EDFScheduler {
         
             self.select_thread();
         }
+        //print!("After schedule");
     }
 
     fn select_thread(&mut self) {

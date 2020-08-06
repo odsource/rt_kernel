@@ -77,7 +77,10 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     EDF.force_unlock();
     let lock = EDF.try_lock();
     match lock {
-    	Some(mut s) => s.schedule(),
+    	Some(mut s) => {
+    		//print!("Before schedule");
+    		s.schedule();
+    	},
     	None => print!("None"),
     }
     //println!("End of interrupt");
