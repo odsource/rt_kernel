@@ -8,7 +8,7 @@ use pic8259_simple::ChainedPics;
 use spin;
 use crate::print;
 use crate::hlt_loop;
-use crate::scheduler::EDF;
+use crate::scheduler::{EDF, EDFScheduler};
 
 pub static mut GLOBAL_TIME: u64 = 0;
 
@@ -66,7 +66,7 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     print!(".");
     unsafe { GLOBAL_TIME += 1 };
 
-    println!("Before schedule");
+    //println!("Before schedule");
 
     // Has to be in front of EDF.schedule() because after the context switch it will never be executed
     unsafe {
@@ -74,7 +74,11 @@ extern "x86-interrupt" fn timer_interrupt_handler(
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }
     
-    EDF.lock().schedule();
+    let lock = EDF.try_lock();
+    match lock {
+    	Some(mut s) => s.schedule(),
+    	None => print!("None"),
+    }
     //println!("End of interrupt");
 }
 

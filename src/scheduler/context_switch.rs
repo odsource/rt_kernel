@@ -31,7 +31,7 @@ global_asm!("
 
 	switch_stack_ptr:
 		// Pushes the register to the stack (RFLAGS)
-		//pushfq
+		pushfq
 
 		mov rax, rsp
 		mov rsp, rsi

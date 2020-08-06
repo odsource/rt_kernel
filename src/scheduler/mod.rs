@@ -31,6 +31,7 @@ impl EDFScheduler {
     }
 
     pub fn schedule(&mut self) {
+        println!("Before init");
         if self.init == true {
             println!("Inside init");
             self.print_tree();
@@ -86,6 +87,10 @@ pub fn context(stack_ptr: VirtAddr) {
     context_switch::switch_context(stack_ptr);
 }
 
+pub fn yield_thread() {
+    EDF.lock().schedule();
+}
+
 /// A wrapper around spin::Mutex to permit trait implementations.
 pub struct Locked<A> {
     inner: spin::Mutex<A>,
@@ -100,5 +105,9 @@ impl<A> Locked<A> {
 
     pub fn lock(&self) -> spin::MutexGuard<A> {
         self.inner.lock()
+    }
+
+    pub fn try_lock(&self) -> Option<spin::MutexGuard<A>> {
+        self.inner.try_lock()
     }
 }
