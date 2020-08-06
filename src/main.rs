@@ -83,7 +83,6 @@ async fn example_task() {
 }
 
 fn thread1_loop() -> ! {
-	scheduler::EDF.force_unlock();
     let a: [u64; 2] = [1, 2];
     let mut i = 0;
     println!("Thread 1");
@@ -99,7 +98,6 @@ fn thread1_loop() -> ! {
 }
 
 fn thread2_loop() -> ! {
-	scheduler::EDF.force_unlock();
     let a: [u64; 2] = [1, 2];
     let mut i = 0;
     println!("Thread 2");

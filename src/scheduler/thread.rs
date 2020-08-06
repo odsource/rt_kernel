@@ -28,7 +28,10 @@ impl Thread {
         let mut stack = unsafe {
             context_switch::Stack::new(stack_frame.end)
         };
-        stack.method(function);
+        stack.write(function);
+        // Enable Interrupts
+        let flags: u64 = 0x200;
+        stack.write(flags);
         let stack_ptr = stack.get_ptr();
 
         Ok(Thread {

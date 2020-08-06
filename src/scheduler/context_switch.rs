@@ -33,7 +33,7 @@ pub fn first_switch_context(new_stack_ptr: VirtAddr) {
 	println!("context stack_ptr: {:?}", new_stack_ptr);
 	unsafe {
     	llvm_asm!(
-    		"call first_switch_stack_ptr"
+    		"call switch_stack_ptr"
     		:
     		: "{rsi}"(new_stack_ptr)
     		: "rax", "rbx", "rcx", "rdx", "rbp", "rsi", "rdi", "rflags", "memory", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"
@@ -76,7 +76,7 @@ global_asm!("
 
 #[no_mangle]
 pub extern "C" fn old_stack_ptr(old_ptr: VirtAddr) {
-	scheduler::EDF.force_unlock();
+	//scheduler::EDF.force_unlock();
     scheduler::EDF.lock().update_stack_ptr(old_ptr);
 }
 
@@ -97,7 +97,7 @@ impl Stack {
     }
 
     // Write the loop-function to the stack
-    pub fn method<T>(&mut self, function: T) {
+    pub fn write<T>(&mut self, function: T) {
     	let stack_size = mem::size_of::<T>();
         println!("Ptr is on: {:?}", self.ptr);
     	self.ptr -= stack_size;
