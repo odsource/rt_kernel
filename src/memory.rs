@@ -109,15 +109,16 @@ pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut
 	// Atomic operation to ensure there is no context switch
 	static STACK: AtomicU64 = AtomicU64::new(0x_8888_8888_0000);
 	let new_stack_start = STACK.fetch_add(8 * Page::<Size4KiB>::SIZE, Ordering::SeqCst);
-	
-	// Ensuring that two stack spaces are divided wide enough
-	STACK.fetch_add(Page::<Size4KiB>::SIZE, Ordering::SeqCst);
 
-	let stack_start = Page::from_start_address(VirtAddr::new(new_stack_start)).expect("Stack start not accessible");
+	let stack_start = Page::from_start_address(VirtAddr::new(new_stack_start)).expect("Stack start not accessible") + 1;
 	println!();
-	println!("new_stack_start: {:?}, stack_start: {:?}", new_stack_start, stack_start);
+	println!("stack_start: {:?}", stack_start);
 	println!();
 	let stack_end = stack_start + 8;
+
+	println!();
+	println!("stack_start: {:?}, stack_end: {:?}", stack_start, stack_end);
+	println!();
 
 	// Flags:
 	// present: frame is loaded into memory

@@ -66,7 +66,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 */
     // not needed because the Executor::run() function is marked as diverging
     // and thus never returns
-    // rt_kernel::hlt_loop();
+    rt_kernel::hlt_loop();
 }
 
 async fn async_number() -> u32 {
@@ -80,24 +80,31 @@ async fn example_task() {
 
 fn thread1_loop() -> ! {
     let a: [u64; 2] = [1, 2];
-    //println!("Thread 1");
+    let mut i = 0;
+    println!("Thread 1");
     loop {
-        println!("Thread {} executing", a[0]);
-        //scheduler::yield_thread();
+    	/*if i == 100000000 {
+    		i = 0;
+    		println!("Thread {} executing", a[0]);
+    	}
+        i += 1;*/
+        //println!("Thread {} executing", a[0]);
+        scheduler::yield_thread();
     }
 }
 
 fn thread2_loop() -> ! {
     let a: [u64; 2] = [1, 2];
     let mut i = 0;
-    //println!("Thread 2");
+    println!("Thread 2");
     loop {
-    	if i == 100000000 {
+    	/*if i == 100000000 {
     		i = 0;
     		println!("Thread {} executing", a[1]);
     	}
-        i += 1;
-        //scheduler::yield_thread();
+        i += 1;*/
+        //println!("Thread {} executing", a[1]);
+        scheduler::yield_thread();
     }
 }
 

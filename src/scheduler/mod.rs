@@ -18,11 +18,12 @@ pub struct EDFScheduler {
     init: bool,
     tasks: BTreeMap<u64, thread::Thread>,
     active_task: u64,
+    old_task: u64,
 }
 
 impl EDFScheduler {
     pub fn new() -> Self {
-        EDFScheduler { init: false, tasks: BTreeMap::new(), active_task: 0 }
+        EDFScheduler { init: false, tasks: BTreeMap::new(), active_task: 0, old_task: 0 }
     }
 
     pub fn start(&mut self) {
@@ -31,10 +32,10 @@ impl EDFScheduler {
     }
 
     pub fn schedule(&mut self) {
-        println!("Before init");
+        //println!("Before init");
         if self.init == true {
-            println!("Inside init");
-            self.print_tree();
+            //println!("Inside init");
+            //self.print_tree();
             if let Some(at) = self.tasks.get_mut(&self.active_task) {
                 at.remain_runtime -= 1;
 
@@ -54,11 +55,22 @@ impl EDFScheduler {
         if let Some((key, val)) = self.tasks.first_key_value() {
             if *key != self.active_task {
                 println!("Before context switch");
+                self.old_task = self.active_task;
                 self.active_task = *key;
-                self.init = true;
-                context(val.stack_ptr.expect("No stack pointer inside thread!")); 
+                if self.init == false {
+                    self.init = true;
+                    first_context(val.stack_ptr.expect("No stack pointer inside thread!"));
+                } else {
+                    context(val.stack_ptr.expect("No stack pointer inside thread!")); 
+                }
             }
         }  
+    }
+
+    pub fn update_stack_ptr(&mut self, stack_ptr: VirtAddr) {
+        if let Some(ot) = self.tasks.get_mut(&self.old_task) {
+            ot.stack_ptr = Some(stack_ptr);
+        }
     }
 
     pub fn new_thread(&mut self, t: thread::Thread) {
@@ -87,7 +99,12 @@ pub fn context(stack_ptr: VirtAddr) {
     context_switch::switch_context(stack_ptr);
 }
 
+pub fn first_context(stack_ptr: VirtAddr) {
+    context_switch::first_switch_context(stack_ptr);
+}
+
 pub fn yield_thread() {
+    EDF.force_unlock();
     EDF.lock().schedule();
 }
 
@@ -109,5 +126,9 @@ impl<A> Locked<A> {
 
     pub fn try_lock(&self) -> Option<spin::MutexGuard<A>> {
         self.inner.try_lock()
+    }
+
+    fn force_unlock(&self) {
+        unsafe {self.inner.force_unlock();}
     }
 }
