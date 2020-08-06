@@ -9,6 +9,7 @@ use spin;
 use crate::print;
 use crate::hlt_loop;
 use crate::scheduler::{EDF, OLD_POINTER, EDFScheduler};
+use crate::scheduler;
 
 pub static mut GLOBAL_TIME: u64 = 0;
 
@@ -75,15 +76,31 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     }
     
     //EDF.force_unlock();
+    EDF.lock().set_old_ptr(OLD_POINTER.lock().get_ptr());
+    let pair = EDF.lock().schedule();
+    match pair {
+    	Some((k,v)) => {
+    		scheduler::context(v.stack_ptr.expect("No stack pointer inside thread!"));
+    	},
+    	None => println!("No context"),
+    }
+    /*
     let lock = EDF.try_lock();
     match lock {
     	Some(mut s) => {
     		//print!("Before schedule");
     		s.set_old_ptr(OLD_POINTER.lock().get_ptr());
-    		s.schedule();
+    		let pair = s.schedule();
+    		match pair {
+		    	Some((k,v)) => {
+		    		scheduler::context(v.stack_ptr.expect("No stack pointer inside thread!"));
+		    	},
+		    	None => println!("No context"),
+		    }
     	},
     	None => print!("None"),
     }
+    */
     //println!("End of interrupt");
 }
 

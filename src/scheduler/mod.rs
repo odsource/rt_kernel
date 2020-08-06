@@ -48,9 +48,9 @@ impl EDFScheduler {
         EDFScheduler { init: false, tasks: BTreeMap::new(), active_task: 0, old_task: 0 }
     }
 
-    pub fn start(&mut self) {
+    pub fn start(&mut self) -> Option<(u64, thread::Thread)> {
         println!("Scheduler started");
-        self.select_thread();
+        self.select_thread()
     }
 
     pub fn set_old_ptr(&mut self, ptr: VirtAddr) {
@@ -60,7 +60,7 @@ impl EDFScheduler {
         }
     }
 
-    pub fn schedule(&mut self) {
+    pub fn schedule(&mut self) -> Option<(u64, thread::Thread)> {
         if self.init == true {
             //println!("Inside init");
             //self.print_tree();
@@ -75,23 +75,29 @@ impl EDFScheduler {
                 }
             }
         
-            self.select_thread();
+            return self.select_thread()
         }
+        None
         //print!("After schedule");
     }
 
-    fn select_thread(&mut self) -> Option<(u64, thread::Thread)>{
+    fn select_thread(&mut self) -> Option<(u64, thread::Thread)> {
         let pair = self.tasks.first_key_value();
-        let key;
-        let val;
         match pair {
-            Some((k,v)) => {
-                key = k;
-                val = v;
+            Some((key,val)) => {
+                if *key != self.active_task {
+                    println!("Before context switch");
+                    self.old_task = self.active_task;
+                    self.active_task = *key;
+                    if self.init == false {
+                        self.init = true;
+                    }
+                    
+                }
+                Some((*key,*val))
             },
-            None => (),
-        };
-        Some((*key, *val))
+            None => None,
+        }
         /*
         if let Some((key, val)) = self.tasks.first_key_value() {
             if *key != self.active_task {

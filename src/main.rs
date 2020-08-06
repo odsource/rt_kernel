@@ -40,9 +40,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     if let Ok(mut t1) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread1_loop) {
         t1.initialize(exec, deadl, period);
-        x86_64::instructions::interrupts::disable();
         scheduler::EDF.lock().new_thread(t1);
-        x86_64::instructions::interrupts::enable();
     }
     
     let exec2 = 30;
@@ -51,16 +49,21 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     if let Ok(mut t2) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread2_loop) {
         t2.initialize(exec2, deadl2, period2);
-        x86_64::instructions::interrupts::disable();
         scheduler::EDF.lock().new_thread(t2);
-        x86_64::instructions::interrupts::enable();
     }
 
     //scheduler::EDF.lock().print_tree();
     x86_64::instructions::interrupts::disable();
-    scheduler::EDF.lock().start();
+    let pair = scheduler::EDF.lock().start();
 
-    println!("It did not crash!");
+    match pair {
+    	Some((k,v)) => {
+    		scheduler::context(v.stack_ptr.expect("No stack pointer inside thread!"));
+    	},
+    	None => println!("No pair context"),
+    }
+
+    //println!("It did not crash!");
 
 /*
     let mut executor = Executor::new();
