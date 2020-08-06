@@ -52,9 +52,9 @@ global_asm!("
 		mov rax, rsp
 		mov rsp, rsi
 
-		mov rdi, rax
+		//mov rdi, rax
 
-		//call old_stack_ptr
+		call old_stack_ptr
 
 		// Pops the stack register to the register (RFLAGS)
 		popfq
@@ -82,7 +82,8 @@ global_asm!("
 #[no_mangle]
 pub extern "C" fn old_stack_ptr(old_ptr: VirtAddr) {
 	//scheduler::EDF.force_unlock();
-    scheduler::EDF.lock().update_stack_ptr(old_ptr);
+    //scheduler::EDF.lock().update_stack_ptr(old_ptr);
+    scheduler::OLD_POINTER.lock().set_ptr(old_ptr);
 }
 
 // switch virtual memory mapping of the old process with the new one

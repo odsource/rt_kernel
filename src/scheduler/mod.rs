@@ -14,6 +14,28 @@ lazy_static! {
     pub static ref EDF: Locked<EDFScheduler> = Locked::new(EDFScheduler::new());
 }
 
+lazy_static! {
+    pub static ref OLD_POINTER: Locked<OldPtr> = Locked::new(OldPtr::new());
+}
+
+pub struct OldPtr {
+    ptr: VirtAddr,
+}
+
+impl OldPtr {
+    fn new() -> Self {
+        OldPtr { ptr: VirtAddr::new(0) }
+    }
+
+    pub fn set_ptr(&mut self, ptr: VirtAddr) {
+        self.ptr = ptr;
+    }
+
+    pub fn get_ptr(&self) -> VirtAddr {
+        self.ptr
+    }
+}
+
 pub struct EDFScheduler {
     init: bool,
     tasks: BTreeMap<u64, thread::Thread>,
@@ -29,6 +51,13 @@ impl EDFScheduler {
     pub fn start(&mut self) {
         println!("Scheduler started");
         self.select_thread();
+    }
+
+    pub fn set_old_ptr(&mut self, ptr: VirtAddr) {
+        if let Some(ot) = self.tasks.get_mut(&self.old_task) {
+            ot.stack_ptr = Some(ptr);
+            println!("Old stack pointer: {:?}", ptr);
+        }
     }
 
     pub fn schedule(&mut self) {
@@ -67,12 +96,15 @@ impl EDFScheduler {
         }  
     }
 
+/*
     pub fn update_stack_ptr(&mut self, stack_ptr: VirtAddr) {
         if let Some(ot) = self.tasks.get_mut(&self.old_task) {
             ot.stack_ptr = Some(stack_ptr);
+            println!("Old stack pointer: {:?}", stack_ptr);
         }
+        println!("Functions at all");
     }
-
+*/
     pub fn new_thread(&mut self, t: thread::Thread) {
         let mut u = 0.0;
         for (_key, value) in self.tasks.iter() {

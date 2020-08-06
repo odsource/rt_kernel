@@ -8,7 +8,7 @@ use pic8259_simple::ChainedPics;
 use spin;
 use crate::print;
 use crate::hlt_loop;
-use crate::scheduler::{EDF, EDFScheduler};
+use crate::scheduler::{EDF, OLD_POINTER, EDFScheduler};
 
 pub static mut GLOBAL_TIME: u64 = 0;
 
@@ -79,6 +79,7 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     match lock {
     	Some(mut s) => {
     		//print!("Before schedule");
+    		s.set_old_ptr(OLD_POINTER.lock().get_ptr());
     		s.schedule();
     	},
     	None => print!("None"),
