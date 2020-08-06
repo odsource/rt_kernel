@@ -32,6 +32,7 @@ impl Thread {
         };
         stack.method(function);
         let stack_ptr = stack.get_ptr();
+        println!("Ptr is on: {:?}", stack_ptr);
 
         Ok(Thread {
         	id: ThreadId::new(),

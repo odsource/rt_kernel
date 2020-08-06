@@ -123,6 +123,9 @@ pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut
 	// writable: makes the frame accessible
 	let writable = PageTableFlags::WRITABLE;
 
+	let user = PageTableFlags::USER_ACCESSIBLE;
+	let flags = present | writable | user;
+
 	// allocate each page
 	for p in Page::range(stack_start, stack_end) {
         let frame = frame_allocator.allocate_frame();
@@ -132,7 +135,7 @@ pub fn get_stack_frame(mapper: &mut impl Mapper<Size4KiB>, frame_allocator: &mut
             .ok_or(MapToError::FrameAllocationFailed)?;
 
         unsafe {
-        	mapper.map_to(p, frame, present | writable, frame_allocator)?.flush()
+        	mapper.map_to(p, frame, flags, frame_allocator)?.flush()
         };
     }
 

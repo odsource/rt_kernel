@@ -100,6 +100,7 @@ impl Stack {
         //println!("Function size: {:?}", stack_size);
     	self.ptr -= stack_size;
     	let ptr: *mut T = self.ptr.as_mut_ptr();
+    	println!("Ptr is on: {:?}", self.ptr);
     	unsafe {ptr.write(function)};
     }
 
