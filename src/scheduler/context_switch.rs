@@ -16,7 +16,7 @@ asm!(assembly template
 */
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 pub fn switch_context(new_stack_ptr: VirtAddr) {
-	println!("context stack_ptr: {:?}", new_stack_ptr);
+	//println!("context stack_ptr: {:?}", new_stack_ptr);
 	unsafe {
     	llvm_asm!(
     		"call switch_stack_ptr"
@@ -27,7 +27,7 @@ pub fn switch_context(new_stack_ptr: VirtAddr) {
     	);
 	}
 }
-
+/*
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 pub fn first_switch_context(new_stack_ptr: VirtAddr) {
 	println!("context stack_ptr: {:?}", new_stack_ptr);
@@ -41,7 +41,7 @@ pub fn first_switch_context(new_stack_ptr: VirtAddr) {
     	);
 	}
 }
-
+*/
 global_asm!("
 	.intel_syntax noprefix
 
@@ -52,7 +52,7 @@ global_asm!("
 		mov rax, rsp
 		mov rsp, rsi
 
-		//mov rdi, rax
+		mov rdi, rax
 
 		call old_stack_ptr
 

@@ -86,7 +86,7 @@ impl EDFScheduler {
         match pair {
             Some((key,val)) => {
                 if *key != self.active_task {
-                    println!("Before context switch");
+                    println!("context switch");
                     self.old_task = self.active_task;
                     self.active_task = *key;
                     if self.init == false {
@@ -149,11 +149,11 @@ impl EDFScheduler {
 pub fn context(stack_ptr: VirtAddr) {
     context_switch::switch_context(stack_ptr);
 }
-
+/*
 pub fn first_context(stack_ptr: VirtAddr) {
     context_switch::first_switch_context(stack_ptr);
 }
-
+*/
 pub fn yield_thread() {
     EDF.force_unlock();
     EDF.lock().schedule();

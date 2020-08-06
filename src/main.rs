@@ -52,8 +52,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
         scheduler::EDF.lock().new_thread(t2);
     }
 
-    //scheduler::EDF.lock().print_tree();
-    x86_64::instructions::interrupts::disable();
     let pair = scheduler::EDF.lock().start();
 
     match pair {
@@ -63,14 +61,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     	None => println!("No pair context"),
     }
 
-    //println!("It did not crash!");
-
-/*
-    let mut executor = Executor::new();
-    executor.spawn(Task::new(example_task()));
-    executor.spawn(Task::new(keyboard::print_keypresses()));
-    executor.run();
-*/
+    println!("It did not crash!");
+    
     // not needed because the Executor::run() function is marked as diverging
     // and thus never returns
     rt_kernel::hlt_loop();
