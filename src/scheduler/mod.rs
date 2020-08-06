@@ -63,7 +63,7 @@ impl EDFScheduler {
     pub fn schedule(&mut self) -> Option<(u64, thread::Thread)> {
         if self.init == true {
             //println!("Inside init");
-            //self.print_tree();
+            self.print_tree();
             if let Some(at) = self.tasks.get_mut(&self.active_task) {
                 at.remain_runtime -= 1;
 
