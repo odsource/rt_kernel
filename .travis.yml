@@ -6,9 +6,9 @@ cache:
   directories:
     - $HOME/qemu
 
-before_script:
-  - bash -e travis-qemu.sh
-  - export PATH=$PATH:$HOME/qemu/bin
+#before_script:
+#  - bash -e travis-qemu.sh
+#  - export PATH=$PATH:$HOME/qemu/bin
 
 script:
   - cargo xbuild --verbose --all
