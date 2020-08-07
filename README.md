@@ -22,8 +22,23 @@ In der Funktion `old_stack_ptr(old_ptr)` wird der alte Stackpointer gespeichert 
 
 Zu guter letzt ist noch die Stack Implementierung für den Kontextwechsel, bzw. für die Threads zu finden. Wie schon zuvor gesagt, besteht das `struct Stack` nur aus einem Pointer auf eine virtuelle Adresse. Nachdem der Stack mit einer Stackendadresse initialisiert wurde zeigt der Pointer auf eben diese. Wird nun bei der Threaderzeugung die `write()` Funktion aufgerufen, wird der übergebene Wert auf den Stack geschrieben. Dazu wird zuerst die Größe über die `mem::size_of::<T>()` Methode aus dem `core` crate ermittelt. Um diesen Speicherbedarf wird der Stackpointer verringert. Verringert deshalb, da der Stack negativ wächst also von hohen zu niedrigen Adressen (laut Literatur ist dies nicht in jedem System so, aber in den meisten). Nun benötigen wir wie schon einige Male im Blog gezeigt einen Raw Pointer um die Methode `write()` zu nutzen, welche den übergebenen Wert auf den Stack bzw. in den Speicher schreibt. Dies passiert bei der Threaderzeugung zuerst für den Funktionspointer und im Anschluss für den Wert `0x200`. Der Wert `0x200` repräsentiert die RFLAGS. D.h. wenn der Kontextwechsel stattfindet werden durch das `popfq` die Interrupts wieder aktiviert. Die Reihenfolge ist hierbei auch wichtig da der Stackpointer zu Beginn auf diesen Wert zeigen muss. Sollte er auf den Funktionspointer zeigen, würde kein Timerinterrupt mehr stattfinden und somit kein Kontextwechsel mehr und der Thread würde sich nie beenden.
 
+## scheduler.rs (mod.rs)
+Nun zum EDF Scheduler an sich. Die Schedulerinstanz selbst wird, wie der `ALLOCATOR`, in einem `lazy_static!` Block ausgeführt und wird durch ein `.lock()` mutabel und zugreifbar. Ebenfalls wird sichergestellt, dass nur an einer Stelle gleichzeitig auf den Scheduler zugegriffen werden kann. Das `struct EDFScheduler` selbst hat folgende Felder:
+
+- init: gibt an ob der Scheduler gestartet wurde
+- tasks: eine `BTreeMap` über alle Threads, wobei die Deadline der Key ist
+- active_task: die globale Deadline des aktuellen Thread
+- old_task: die globale Deadline des vorherigen Thread
+
+Bei der Erzeugung der Schedulerinstanz wird der Scheduler nur mit "leeren" Werten initialisiert bzw. eine `BTreeMap` erzeugt. Gefüllt wird der Scheduler erst, sobald Threads hinzugefügt werden. Dabei wird zuerst geschaut, ob der Thread aufgrund der momentanen CPU Auslastung überhaupt hinzugefügt werden kann. Dafür wird über alle Threads iteriert,
+für jeden Thread Runtime/Period berechnet und das Ganze aufsummiert. Ist der Wert kleiner gleich 1 (inklusive potentiellem neuen Thread) kann er hinzugefügt werden. Dies ist zwar nur ein theoretischer Wert, welcher in der Praxis irreal ist, der Einfachheit halber aber so von uns implementiert wurde. Zu beachten ist hierbei noch das wir einen globalen Timer `GLOBAL_TIME` haben, welcher mit jedem Timerinterrupt hochgezählt wird. Dieser bildet die Basis für die Deadline Berechnung, da die Ankunftszeit durch ihn bestimmt wird.
 
 
+Sind nun die ersten Threads beim Scheduler registriert wird die Methode `start()` aufgerufen. Dies führt dazu, dass der Scheduler den ersten Thread heraussucht, der laufen soll. Dazu wird die Methode `select_thread()` genutzt. In dieser wird aus dem `BTreeMap` die kleinste globale Deadline herausgesucht, `old_task` mit dem Wert des zuvor aktiven Threads gefüllt und `active_task` mit dem neuen Key überschrieben und der Thread zusammen mit seiner zugehörigen Deadline bis zum Aufruf durchgereicht. Im Fall von `start()` wird direkt ein Kontextwechsel zu dem ausgewählten Thread durchgeführt (siehe oben). 
+
+Der Scheduler führt nun zu jedem Timerinterrupt seine `schedule()` Methode aus, um anhand der nächsten fälligen Deadline einen Thread auszuwählen. Ist ein Thread komplett durchgelaufen wird er der `BTreeMap` wieder hinzugefügt, allerdings mit neuer globaler Deadline ausgehend von der `GLOBAL_TIME` und zurückgesetzter Laufzeit. Im Anschluss wird wieder die Methode `select_thread()` ausgeführt. Es wurde auch noch eine Methode `yield_thread()` hinzugefügt, diese haben wir allerdings nicht mehr implementieren können.
+
+## interrupt.rs
 
 
-## Ablauf
+## Ablauf (main.rs)
