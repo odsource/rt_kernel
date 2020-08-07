@@ -39,6 +39,6 @@ Sind nun die ersten Threads beim Scheduler registriert wird die Methode `start()
 Der Scheduler führt nun zu jedem Timerinterrupt seine `schedule()` Methode aus, um anhand der nächsten fälligen Deadline einen Thread auszuwählen. Ist ein Thread komplett durchgelaufen wird er der `BTreeMap` wieder hinzugefügt, allerdings mit neuer globaler Deadline ausgehend von der `GLOBAL_TIME` und zurückgesetzter Laufzeit. Im Anschluss wird wieder die Methode `select_thread()` ausgeführt. Es wurde auch noch eine Methode `yield_thread()` hinzugefügt, diese haben wir allerdings nicht mehr implementieren können.
 
 ## interrupt.rs
-
+Wie schon zuvor genannt haben wir einen globalen Timer `GLOBAL_TIME` hinzugefügt, welcher bei jedem Timerinterrupt hochzählt. Zusätzlich wird hier auch jedes mal die Methode `schedule()` des EDF Schedulers aufgerufen und sollte ein Thread zurückgeliefert werden ein Kontextwechsel durchgeführt. Ein Fallstrick hierbei, war es den `notify_end_of_interrupt()` des `PICS` vor dem Kontextwechsel aufzurufen, da der Timerinterrupt sonst ausgeschaltet ist. Dies passiert, da wir nicht mehr aus dem Kontextwechsel zurückkommen und somit (sollte der `PICS` Aufruf danach kommen) kein Aufruf stattfinden kann.
 
 ## Ablauf (main.rs)
