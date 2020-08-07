@@ -34,25 +34,45 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
-    let exec = 20;
-    let deadl = 60;
-    let period = 60;
+    //x86_64::instructions::interrupts::disable();
+    let exec = 25;
+    let deadl = 123;
+    let period = 123;
 
     if let Ok(mut t1) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread1_loop) {
         t1.initialize(exec, deadl, period);
+        println!("Locking T1");
         scheduler::EDF.lock().new_thread(t1);
+        println!("Unlocked T1");
     }
     
     let exec2 = 30;
-    let deadl2 = 50;
-    let period2 = 50;
+    let deadl2 = 61;
+    let period2 = 61;
 
     if let Ok(mut t2) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread2_loop) {
         t2.initialize(exec2, deadl2, period2);
+        println!("Locking T2");
         scheduler::EDF.lock().new_thread(t2);
+        println!("Unlocked T2");
     }
 
+    let exec3 = 5;
+    let deadl3 = 100;
+    let period3 = 100;
+
+    if let Ok(mut t3) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread3_loop) {
+        t3.initialize(exec3, deadl3, period3);
+        println!("Locking T3");
+        scheduler::EDF.lock().new_thread(t3);
+        println!("Unlocked T3");
+    }
+
+
+    println!("Locking START");
     let pair = scheduler::EDF.lock().start();
+    println!("Unlocking START");
+    //x86_64::instructions::interrupts::enable();
 
     match pair {
     	Some((k,v)) => {
@@ -98,6 +118,27 @@ fn thread2_loop() -> ! {
 		    x86_64::instructions::interrupts::enable();
 		    */
     		println!("Thread {} executing", a[1]);
+    	}
+        i += 1;
+        //println!("Thread {} executing", a[1]);
+        //scheduler::yield_thread();
+    }
+}
+
+fn thread3_loop() -> ! {
+    let a: [u64; 3] = [1, 2, 3];
+    let mut i = 0;
+    println!("Thread 3");
+
+    loop {
+    	if i == 10000000 {
+    		i = 0;
+    		/*
+    		x86_64::instructions::interrupts::disable();
+		    scheduler::EDF.lock().print_tree();
+		    x86_64::instructions::interrupts::enable();
+		    */
+    		println!("Thread {} executing", a[2]);
     	}
         i += 1;
         //println!("Thread {} executing", a[1]);

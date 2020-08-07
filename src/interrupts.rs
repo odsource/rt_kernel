@@ -76,14 +76,22 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     }
     
     //EDF.force_unlock();
-    EDF.lock().set_old_ptr(OLD_POINTER.lock().get_ptr());
-    let pair = EDF.lock().schedule();
-    match pair {
-    	Some((k,v)) => {
-    		scheduler::context(v.stack_ptr.expect("No stack pointer inside thread!"));
-    	},
-    	None => println!("No context"),
+    //println!("Locking IR OLD");
+    //EDF.lock().set_old_ptr(OLD_POINTER.lock().get_ptr());
+    //println!("Unlocked IR OLD");
+    println!("Locking IR");
+    if let Some(mut edf) = EDF.try_lock() {
+        let pair = edf.schedule();
+        EDF.force_unlock();
+        println!("Unlocked IR");
+        match pair {
+    	    Some((k,v)) => {
+    		    scheduler::context(v.stack_ptr.expect("No stack pointer inside thread!"));
+    	    },
+    	    None => println!("No context"),
+        }
     }
+    
     /*
     let lock = EDF.try_lock();
     match lock {
