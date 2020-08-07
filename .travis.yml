@@ -18,5 +18,6 @@ install:
   - export PATH=$PATH:$HOME/qemu/bin
   - rustup component add rust-src
   - rustup component add llvm-tools-preview
+  - rustup target add thumbv7em-none-eabihf
   - cargo install bootimage --vers 0.8.0 --target target.json
   - cargo xbuild --verbose --all
