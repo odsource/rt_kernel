@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/odsource/rt_kernel.svg?branch=master)](https://travis-ci.org/odsource/rt_kernel)
 # rt_kernel
 Realtime kernel based on the blog posts of Philipp Oppermann and extended by an EDF Scheduler approach.
 
