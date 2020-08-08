@@ -9,6 +9,7 @@ before_install:
 install:
   - rustup component add rust-src
   - rustup component add llvm-tools-preview
+  - cd ..
   - cargo install bootimage
 
 script:
