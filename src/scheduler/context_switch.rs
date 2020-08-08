@@ -16,7 +16,6 @@ asm!(assembly template
 */
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 pub fn switch_context(new_stack_ptr: VirtAddr) {
-	//println!("context stack_ptr: {:?}", new_stack_ptr);
 	unsafe {
     	llvm_asm!(
     		"call switch_stack_ptr"
@@ -27,21 +26,7 @@ pub fn switch_context(new_stack_ptr: VirtAddr) {
     	);
 	}
 }
-/*
-#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-pub fn first_switch_context(new_stack_ptr: VirtAddr) {
-	println!("context stack_ptr: {:?}", new_stack_ptr);
-	unsafe {
-    	llvm_asm!(
-    		"call switch_stack_ptr"
-    		:
-    		: "{rsi}"(new_stack_ptr)
-    		: "rax", "rbx", "rcx", "rdx", "rbp", "rsi", "rdi", "rflags", "memory", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"
-    		: "intel", "volatile"
-    	);
-	}
-}
-*/
+
 global_asm!("
 	.intel_syntax noprefix
 
@@ -61,28 +46,8 @@ global_asm!("
 		ret
 ");
 
-// Obsolete because of the interrupt enable through 0x200
-/*
-global_asm!("
-	.intel_syntax noprefix
-
-	first_switch_stack_ptr:
-		// Pushes the register to the stack (RFLAGS)
-		pushfq
-
-		mov rax, rsp
-		mov rsp, rsi
-
-		popfq
-		
-		ret
-");
-*/
-
 #[no_mangle]
 pub extern "C" fn old_stack_ptr(old_ptr: VirtAddr) {
-	//scheduler::EDF.force_unlock();
-    //scheduler::EDF.lock().update_stack_ptr(old_ptr);
     scheduler::OLD_POINTER.lock().set_ptr(old_ptr);
 }
 

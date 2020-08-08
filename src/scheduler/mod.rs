@@ -70,7 +70,7 @@ impl EDFScheduler {
                 if at.remain_runtime == 0 {
                     if let Some(mut rpt) = self.tasks.remove(&self.active_task) {
                         rpt.remain_runtime = rpt.runtime;
-                        unsafe{ self.tasks.insert(GLOBAL_TIME + rpt.deadline, rpt) };
+                        unsafe{ self.tasks.insert(self.active_task + rpt.deadline, rpt) };
                     }
                 }
             }
@@ -78,7 +78,6 @@ impl EDFScheduler {
             return self.select_thread()
         }
         None
-        //print!("After schedule");
     }
 
     fn select_thread(&mut self) -> Option<(u64, thread::Thread)> {
@@ -86,44 +85,18 @@ impl EDFScheduler {
         match pair {
             Some((key,val)) => {
                 if *key != self.active_task {
-                    println!("context switch");
                     self.old_task = self.active_task;
                     self.active_task = *key;
                     if self.init == false {
                         self.init = true;
                     }
-                    
                 }
                 Some((*key,*val))
             },
             None => None,
         }
-        /*
-        if let Some((key, val)) = self.tasks.first_key_value() {
-            if *key != self.active_task {
-                println!("Before context switch");
-                self.old_task = self.active_task;
-                self.active_task = *key;
-                if self.init == false {
-                    self.init = true;
-                    first_context(val.stack_ptr.expect("No stack pointer inside thread!"));
-                } else {
-                    context(val.stack_ptr.expect("No stack pointer inside thread!")); 
-                }
-            }
-        } 
-        */ 
     }
 
-/*
-    pub fn update_stack_ptr(&mut self, stack_ptr: VirtAddr) {
-        if let Some(ot) = self.tasks.get_mut(&self.old_task) {
-            ot.stack_ptr = Some(stack_ptr);
-            println!("Old stack pointer: {:?}", stack_ptr);
-        }
-        println!("Functions at all");
-    }
-*/
     pub fn new_thread(&mut self, t: thread::Thread) {
         let mut u = 0.0;
         for (_key, value) in self.tasks.iter() {
@@ -146,14 +119,11 @@ impl EDFScheduler {
     }
 }
 
+
 pub fn context(stack_ptr: VirtAddr) {
     context_switch::switch_context(stack_ptr);
 }
-/*
-pub fn first_context(stack_ptr: VirtAddr) {
-    context_switch::first_switch_context(stack_ptr);
-}
-*/
+
 pub fn yield_thread() {
     EDF.force_unlock();
     EDF.lock().schedule();

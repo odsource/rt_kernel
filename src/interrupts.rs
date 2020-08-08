@@ -67,23 +67,15 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     print!(".");
     unsafe { GLOBAL_TIME += 1 };
 
-    //println!("Before schedule");
-
     // Has to be in front of EDF.schedule() because after the context switch it will never be executed
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }
     
-    //EDF.force_unlock();
-    //println!("Locking IR OLD");
-    //EDF.lock().set_old_ptr(OLD_POINTER.lock().get_ptr());
-    //println!("Unlocked IR OLD");
-    println!("Locking IR");
     if let Some(mut edf) = EDF.try_lock() {
+        edf.set_old_ptr(OLD_POINTER.lock().get_ptr());
         let pair = edf.schedule();
-        EDF.force_unlock();
-        println!("Unlocked IR");
         match pair {
     	    Some((k,v)) => {
     		    scheduler::context(v.stack_ptr.expect("No stack pointer inside thread!"));
@@ -91,25 +83,7 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     	    None => println!("No context"),
         }
     }
-    
-    /*
-    let lock = EDF.try_lock();
-    match lock {
-    	Some(mut s) => {
-    		//print!("Before schedule");
-    		s.set_old_ptr(OLD_POINTER.lock().get_ptr());
-    		let pair = s.schedule();
-    		match pair {
-		    	Some((k,v)) => {
-		    		scheduler::context(v.stack_ptr.expect("No stack pointer inside thread!"));
-		    	},
-		    	None => println!("No context"),
-		    }
-    	},
-    	None => print!("None"),
-    }
-    */
-    //println!("End of interrupt");
+    EDF.force_unlock();
 }
 
 extern "x86-interrupt" fn breakpoint_handler(

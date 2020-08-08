@@ -34,16 +34,13 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
-    //x86_64::instructions::interrupts::disable();
     let exec = 25;
-    let deadl = 123;
-    let period = 123;
+    let deadl = 119;
+    let period = 119;
 
     if let Ok(mut t1) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread1_loop) {
         t1.initialize(exec, deadl, period);
-        println!("Locking T1");
         scheduler::EDF.lock().new_thread(t1);
-        println!("Unlocked T1");
     }
     
     let exec2 = 30;
@@ -52,9 +49,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     if let Ok(mut t2) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread2_loop) {
         t2.initialize(exec2, deadl2, period2);
-        println!("Locking T2");
         scheduler::EDF.lock().new_thread(t2);
-        println!("Unlocked T2");
     }
 
     let exec3 = 5;
@@ -63,16 +58,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     if let Ok(mut t3) = scheduler::thread::Thread::new(&mut mapper, &mut frame_allocator, thread3_loop) {
         t3.initialize(exec3, deadl3, period3);
-        println!("Locking T3");
         scheduler::EDF.lock().new_thread(t3);
-        println!("Unlocked T3");
     }
 
-
-    println!("Locking START");
     let pair = scheduler::EDF.lock().start();
-    println!("Unlocking START");
-    //x86_64::instructions::interrupts::enable();
 
     match pair {
     	Some((k,v)) => {
