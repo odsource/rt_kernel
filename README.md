@@ -3,6 +3,8 @@ Realtime kernel based on the blog posts of Philipp Oppermann and extended by an 
 
 Der Branch `master` enthält die aktuelle Version des Projekts!
 
+![Kontextwechsel](https://github.com/odsource/rt_kernel/blob/master/QEMU_context_switch.png?raw=true)
+
 ## memory.rs
 Für die Speicherverwaltung (Stack) wurde ein `struct StackFrame` erstellt, welches den Stackbereich jedes Threads darstellt. Der Bereich wird über zwei virtuelle Adressen (Start und Ende) abgebildet. Um solch einen Stackbereich zu erhalten muss die Funktion `get_stack_frame(mapper, frame_allocator)` aufgerufen werden. Dies passiert bei jeder Threaderstellung. 
 
@@ -42,4 +44,4 @@ Der Scheduler führt nun zu jedem Timerinterrupt seine `schedule()` Methode aus,
 Wie schon zuvor genannt haben wir einen globalen Timer `GLOBAL_TIME` hinzugefügt, welcher bei jedem Timerinterrupt hochzählt. Zusätzlich wird hier auch jedes mal die Methode `schedule()` des EDF Schedulers aufgerufen und sollte ein Thread zurückgeliefert werden ein Kontextwechsel durchgeführt. Ein Fallstrick hierbei, war es den `notify_end_of_interrupt()` des `PICS` vor dem Kontextwechsel aufzurufen, da der Timerinterrupt sonst ausgeschaltet ist. Dies passiert, da wir nicht mehr aus dem Kontextwechsel zurückkommen und somit (sollte der `PICS` Aufruf danach kommen) kein Aufruf stattfinden kann.
 
 ## .travis.yml
-Leider konnten wir Travis nicht erfolgreich implementieren, da das Target nicht gefunden werden konnte und online keine Hilfestellung dazu gefunden wurde.
+Leider konnten wir Travis nicht erfolgreich implementieren, da das Target nicht gefunden werden konnte und online keine Hilfestellung dazu gefunden wurde. Die selbe Fehlermeldung lässt sich lokal replizieren, indem wir `#![no_std]` auskommentieren. Allerdings macht es keinen Sinn, dass es lokal auskommentiert zur gleichen Fehlermeldung wie bei Travis kommt, obwohl dort `#![no_std]` nicht auskommentiert ist.
