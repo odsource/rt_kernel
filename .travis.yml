@@ -1,24 +1,15 @@
 language: rust
 rust:
   - nightly
-  
-cache:
-  directories:
-    - $HOME/qemu
 
-#before_script:
-#  - bash -e travis-qemu.sh
-#  - export PATH=$PATH:$HOME/qemu/bin
-
-script:
-  - cargo xbuild --verbose --all
-  - qemu-system-x86_64 -drive format=raw,file=target/target/debug/bootimage-rt_kernel.bin
+before_install:
+  - sudo apt update
+  - sudo apt install qemu-system-x86
 
 install:
-  - bash -e travis-qemu.sh
-  - export PATH=$PATH:$HOME/qemu/bin
   - rustup component add rust-src
   - rustup component add llvm-tools-preview
-  - rustup target add thumbv7em-none-eabihf
-  - cargo install bootimage --vers 0.8.0 --target target.json --verbose
-  - cargo xbuild --verbose --all
+  - cargo install bootimage
+
+script:
+  - cargo run
