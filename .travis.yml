@@ -2,10 +2,6 @@ language: rust
 rust:
   - nightly
 
-before_install:
-  - sudo apt update
-  - sudo apt install qemu-system-x86
-
 install:
   - rustup component add rust-src
   - rustup component add llvm-tools-preview
@@ -15,4 +11,3 @@ install:
 
 script:
   - cargo build
-  - qemu-system-x86_64 -nographic -drive format=raw,file=target/target/debug/bootimage-rt_kernel.bin
