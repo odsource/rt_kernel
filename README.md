@@ -45,6 +45,3 @@ Die bisherige Implementierung mit der in Rust bereitgestellen alloc::collections
 
 ## interrupt.rs
 Wie schon zuvor genannt haben wir einen globalen Timer `GLOBAL_TIME` hinzugefügt, welcher bei jedem Timerinterrupt hochzählt. Zusätzlich wird hier auch jedes mal die Methode `schedule()` des EDF Schedulers aufgerufen und sollte ein Thread zurückgeliefert werden ein Kontextwechsel durchgeführt. Ein Fallstrick hierbei, war es den `notify_end_of_interrupt()` des `PICS` vor dem Kontextwechsel aufzurufen, da der Timerinterrupt sonst ausgeschaltet ist. Dies passiert, da wir nicht mehr aus dem Kontextwechsel zurückkommen und somit (sollte der `PICS` Aufruf danach kommen) kein Aufruf stattfinden kann.
-
-## .travis.yml
-Leider konnten wir Travis nicht erfolgreich implementieren, da das Target nicht gefunden werden konnte und online keine Hilfestellung dazu gefunden wurde. Die selbe Fehlermeldung lässt sich lokal replizieren, indem wir `#![no_std]` auskommentieren. Allerdings macht es keinen Sinn, dass es lokal auskommentiert zur gleichen Fehlermeldung wie bei Travis kommt, obwohl dort `#![no_std]` nicht auskommentiert ist.
